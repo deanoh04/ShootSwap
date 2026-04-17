@@ -1,0 +1,1672 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Soul Swap — Bullet Heaven</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%; width: 100%;
+    background: #0b0d12; color: #e6e6e6;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    overflow: hidden;
+  }
+  #game {
+    display: block;
+    width: 100vw; height: 100vh;
+    background: radial-gradient(1200px 800px at 50% 50%, #141824 0%, #0b0d12 70%);
+    cursor: none;
+  }
+  #hud {
+    position: fixed; top: 12px; left: 12px;
+    padding: 10px 14px;
+    background: rgba(10,12,18,0.65);
+    border: 1px solid #2a2f3d;
+    border-radius: 8px;
+    font-size: 13px; line-height: 1.55;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+  }
+  #hud .k { color: #8aa0ff; }
+  #hud .v { color: #ffffff; font-weight: 600; }
+  #hud .hp-row {
+    display: flex; align-items: center; gap: 8px; margin-top: 5px;
+  }
+  #hud .hp-track {
+    flex: 1; min-width: 80px; height: 7px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    border: 1px solid #2a2f3d;
+    overflow: hidden;
+  }
+  #hud .hp-fill {
+    height: 100%; width: 100%;
+    background: #7cf59a;
+    border-radius: 4px;
+    transition: width 0.12s ease, background 0.3s ease;
+  }
+  #hud .hp-fill.warn  { background: #f5d77c; }
+  #hud .hp-fill.crit  { background: #f57c7c; }
+  #hint {
+    position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+    font-size: 12px; color: #8a90a2;
+    background: rgba(10,12,18,0.5);
+    padding: 6px 10px; border-radius: 6px;
+    border: 1px solid #2a2f3d;
+  }
+  /* Swap prompt */
+  #swap {
+    position: fixed; inset: 0;
+    display: none; align-items: center; justify-content: center;
+    background: rgba(5,7,12,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 20;
+  }
+  #swap.on { display: flex; }
+  #swap .card {
+    width: min(520px, 92vw);
+    padding: 22px 24px;
+    background: #121622;
+    border: 1px solid #2a2f3d;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  #swap h2 {
+    margin: 0 0 4px 0; font-size: 18px; color: #e6e6e6; letter-spacing: 0.5px;
+  }
+  #swap .sub { color: #8a90a2; font-size: 12px; margin-bottom: 16px; }
+  #swap .row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  #swap .opt {
+    padding: 14px; border: 1px solid #2a2f3d; border-radius: 10px;
+    background: #0f1320; cursor: pointer; transition: all 0.15s ease;
+  }
+  #swap .opt:hover { border-color: #8aa0ff; background: #141a2c; }
+  #swap .opt h3 { margin: 0 0 4px 0; font-size: 14px; color: #fff; }
+  #swap .opt p { margin: 0; color: #9aa2b8; font-size: 12px; line-height: 1.5; }
+  #swap .key {
+    display: inline-block; min-width: 18px; text-align: center;
+    padding: 1px 6px; margin-right: 6px;
+    font-size: 11px; color: #bfe3ff;
+    background: #1a2340; border: 1px solid #2a3a66; border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+
+<div id="hud">
+  <div><span class="k">Kills:</span> <span class="v" id="hud-kills">0</span></div>
+  <div><span class="k">Ability:</span> <span class="v" id="hud-ability">Basic Bolt</span></div>
+  <div><span class="k">Time:</span> <span class="v" id="hud-time">0:00</span></div>
+  <div class="hp-row">
+    <span class="k">HP</span>
+    <div class="hp-track">
+      <div class="hp-fill" id="hud-hp-fill"></div>
+    </div>
+    <span class="v" id="hud-hp-val">100</span>
+  </div>
+</div>
+<div id="hint">WASD / Arrows to move · Aim with mouse · Soul Orbs trigger Swap?</div>
+
+<!-- Swap prompt overlay (shown when player picks up a Soul Orb) -->
+<div id="swap">
+  <div class="card">
+    <h2>Soul Orb absorbed</h2>
+    <div class="sub" id="swap-sub">Choose an ability. Game is paused.</div>
+    <div class="row">
+      <div class="opt" id="opt-keep">
+        <h3><span class="key">1</span><span id="keep-name">Keep Current</span></h3>
+        <p id="keep-desc">Your current ability.</p>
+      </div>
+      <div class="opt" id="opt-swap">
+        <h3><span class="key">2</span><span id="swap-name">Swap To ???</span></h3>
+        <p id="swap-desc">Inherited signature ability.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   SOUL SWAP — Bullet Heaven
+   Single-file vanilla JS + HTML5 Canvas · lightweight ECS
+   Features in this build:
+     • Fixed-ish timestep game loop with dt clamp
+     • Camera-centered world, WASD / arrow movement
+     • Mouse-aimed auto-firing weapon (fires toward cursor)
+     • 3 enemy archetypes with signature abilities:
+         - Fire Bat      -> shoots fireballs at the player
+         - Frost Slime   -> leaves a slowing frost trail
+         - Stone Golem   -> periodic AoE damage pulse
+     • Soul Orb drops (10%) + pause-and-Swap prompt
+     • Player weapon variants (bolt / fireball / frost trail / aoe pulse)
+   ========================================================================= */
+
+(() => {
+  'use strict';
+
+  // --------------------------- Canvas + Sizing --------------------------- //
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  let VIEW_W = 0, VIEW_H = 0;
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    VIEW_W = window.innerWidth;
+    VIEW_H = window.innerHeight;
+    canvas.width = Math.floor(VIEW_W * dpr);
+    canvas.height = Math.floor(VIEW_H * dpr);
+    canvas.style.width = VIEW_W + 'px';
+    canvas.style.height = VIEW_H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // --------------------------- Input System ----------------------------- //
+  const Input = {
+    keys: new Set(),
+    mouse: { x: VIEW_W / 2, y: VIEW_H / 2 },   // screen-space
+    axis() {
+      let x = 0, y = 0;
+      if (this.keys.has('KeyW') || this.keys.has('ArrowUp'))    y -= 1;
+      if (this.keys.has('KeyS') || this.keys.has('ArrowDown'))  y += 1;
+      if (this.keys.has('KeyA') || this.keys.has('ArrowLeft'))  x -= 1;
+      if (this.keys.has('KeyD') || this.keys.has('ArrowRight')) x += 1;
+      const m = Math.hypot(x, y);
+      if (m > 0) { x /= m; y /= m; }
+      return { x, y };
+    },
+    // Direction from player (screen center) toward cursor, normalized.
+    aimDir() {
+      const dx = this.mouse.x - VIEW_W / 2;
+      const dy = this.mouse.y - VIEW_H / 2;
+      const d = Math.hypot(dx, dy);
+      if (d < 0.0001) return { x: 1, y: 0 };
+      return { x: dx / d, y: dy / d };
+    }
+  };
+  window.addEventListener('keydown', e => {
+    Input.keys.add(e.code);
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault();
+    // Bootstrap audio on first keypress (satisfies browser autoplay policy).
+    GameAudio.init();
+    // Swap prompt keyboard shortcuts.
+    if (Game.paused && Game.pendingSwap) {
+      if (e.code === 'Digit1' || e.code === 'KeyK') resolveSwap(false);
+      else if (e.code === 'Digit2' || e.code === 'KeyS' || e.code === 'Enter') resolveSwap(true);
+    }
+  });
+  canvas.addEventListener('click', () => GameAudio.init(), { once: true });
+  window.addEventListener('keyup', e => Input.keys.delete(e.code));
+  window.addEventListener('blur', () => Input.keys.clear());
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    Input.mouse.x = e.clientX - r.left;
+    Input.mouse.y = e.clientY - r.top;
+  });
+
+  // --------------------------- ECS Core --------------------------------- //
+  const ECS = {
+    nextId: 1,
+    alive: new Set(),
+    components: Object.create(null),
+
+    createEntity() { const id = this.nextId++; this.alive.add(id); return id; },
+    destroyEntity(id) {
+      this.alive.delete(id);
+      for (const name in this.components) this.components[name].delete(id);
+    },
+    registerComponent(name) {
+      if (!this.components[name]) this.components[name] = new Map();
+      return this.components[name];
+    },
+    add(id, name, data) {
+      const store = this.components[name] || this.registerComponent(name);
+      store.set(id, data);
+      return data;
+    },
+    get(id, name) { const s = this.components[name]; return s ? s.get(id) : undefined; },
+    has(id, name) { const s = this.components[name]; return !!s && s.has(id); },
+    remove(id, name) { const s = this.components[name]; if (s) s.delete(id); },
+
+    *query(...names) {
+      if (names.length === 0) return;
+      let driver = this.components[names[0]];
+      if (!driver) return;
+      for (const n of names) {
+        const s = this.components[n];
+        if (!s) return;
+        if (s.size < driver.size) driver = s;
+      }
+      outer: for (const [id] of driver) {
+        if (!this.alive.has(id)) continue;
+        for (const n of names) if (!this.components[n] || !this.components[n].has(id)) continue outer;
+        yield id;
+      }
+    }
+  };
+
+  [
+    'Transform', 'Velocity', 'Renderable', 'Health',
+    'PlayerTag', 'EnemyTag', 'Mover',
+    'Weapon', 'Projectile', 'Collider', 'Lifetime',
+    'EnemyAbility',
+    'SoulOrb',        // { sourceType } -- enemy archetype key
+    'SlowField',      // { radius, slowFactor, color }
+    'AoeShockwave',   // { radius, maxRadius, growSpeed, damage, hitSet, color, ownerTag }
+    'Slowed',         // { factor, ttl }  -- attached to enemies touching a slow field
+    // VFX — not real ECS queries, but registered for consistency
+    'Particle',       // standalone pool below (not queried via ECS)
+  ].forEach(ECS.registerComponent.bind(ECS));
+
+  // --------------------------- Camera ----------------------------------- //
+  const Camera = { x: 0, y: 0 };
+  function worldToScreen(wx, wy) {
+    return { x: wx - Camera.x + VIEW_W / 2, y: wy - Camera.y + VIEW_H / 2 };
+  }
+
+  // ----------------------- Particle Pool --------------------------------- //
+  // Kept outside ECS for perf — particles are very short-lived and numerous.
+  // Each entry: { x, y, vx, vy, life, maxLife, color, radius, drag }
+  const Particles = [];
+
+  function spawnDeathParticles(x, y, color, count = 10) {
+    for (let i = 0; i < count; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const spd = 60 + Math.random() * 160;
+      Particles.push({
+        x, y,
+        vx: Math.cos(a) * spd,
+        vy: Math.sin(a) * spd,
+        life: 0.35 + Math.random() * 0.45,
+        maxLife: 0,  // set below
+        color,
+        radius: 1.5 + Math.random() * 3,
+        drag: 0.88,
+      });
+      Particles[Particles.length - 1].maxLife = Particles[Particles.length - 1].life;
+    }
+  }
+
+  function spawnHitSpark(x, y, color) {
+    for (let i = 0; i < 5; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const spd = 100 + Math.random() * 200;
+      Particles.push({
+        x, y,
+        vx: Math.cos(a) * spd,
+        vy: Math.sin(a) * spd,
+        life: 0.1 + Math.random() * 0.15,
+        maxLife: 0,
+        color,
+        radius: 1 + Math.random() * 2,
+        drag: 0.82,
+      });
+      Particles[Particles.length - 1].maxLife = Particles[Particles.length - 1].life;
+    }
+  }
+
+  function particleSystem(dt) {
+    for (let i = Particles.length - 1; i >= 0; i--) {
+      const p = Particles[i];
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vx *= p.drag;
+      p.vy *= p.drag;
+      p.life -= dt;
+      if (p.life <= 0) Particles.splice(i, 1);
+    }
+  }
+
+  function renderParticles() {
+    for (const p of Particles) {
+      const s = worldToScreen(p.x, p.y);
+      const alpha = Math.max(0, p.life / p.maxLife);
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ----------------------- VFX Ring Pool --------------------------------- //
+  // Purely visual expanding rings (pickup flash, hit ripple, etc.)
+  // Each entry: { x, y, radius, maxRadius, growSpeed, color, life, maxLife, lineWidth }
+  const VfxRings = [];
+
+  function spawnVfxRing(x, y, opts) {
+    // opts: { maxRadius, growSpeed, color, life, lineWidth }
+    VfxRings.push({
+      x, y,
+      radius: opts.startRadius || 4,
+      maxRadius: opts.maxRadius || 60,
+      growSpeed: opts.growSpeed || 280,
+      color: opts.color || '#ffffff',
+      life: opts.life || 0.4,
+      maxLife: opts.life || 0.4,
+      lineWidth: opts.lineWidth || 2,
+    });
+  }
+
+  function vfxRingSystem(dt) {
+    for (let i = VfxRings.length - 1; i >= 0; i--) {
+      const r = VfxRings[i];
+      r.radius += r.growSpeed * dt;
+      r.life -= dt;
+      if (r.life <= 0 || r.radius >= r.maxRadius) VfxRings.splice(i, 1);
+    }
+  }
+
+  function renderVfxRings() {
+    for (const r of VfxRings) {
+      const s = worldToScreen(r.x, r.y);
+      const alpha = Math.max(0, r.life / r.maxLife);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.lineWidth = r.lineWidth;
+      ctx.strokeStyle = r.color;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, r.radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  // ----------------------- Audio Manager --------------------------------- //
+  // Uses plain HTML Audio (new Audio()) which works on file:// without CORS.
+  // A small pool of 4 Audio objects for the shoot sound lets rapid fire
+  // overlap without any instance cutting off a previous one.
+  const GameAudio = {
+    _ready: false,
+    _music: null,
+    _footsteps: null,
+    _shootPool: [],
+    _shootIdx: 0,
+    _fireballPool: [],
+    _fireballIdx: 0,
+
+    // Called on first user gesture — creates all Audio objects then.
+    init() {
+      if (this._ready) return;
+      this._ready = true;
+
+      this._music = new Audio('sounds/Moonlit Save Point.mp3');
+      this._music.loop   = true;
+      this._music.volume = 0.35;
+      this._music.play().catch(() => {});
+
+      this._death = new Audio('sounds/death.mp3');
+      this._death.volume = 0.8;
+
+      this._footsteps = new Audio('sounds/footsteps.mp3');
+      this._footsteps.loop   = true;
+      this._footsteps.volume = 0.45;
+
+      for (let i = 0; i < 4; i++) {
+        const a = new Audio('sounds/basic_bullet.mp3');
+        a.volume = 0.3;
+        this._shootPool.push(a);
+      }
+      for (let i = 0; i < 4; i++) {
+        const a = new Audio('sounds/fireball.mp3');
+        a.volume = 0.4;
+        this._fireballPool.push(a);
+      }
+    },
+
+    // No-op if already playing or not yet initialised.
+    startFootsteps() {
+      if (!this._footsteps || !this._footsteps.paused) return;
+      this._footsteps.play().catch(() => {});
+    },
+
+    stopFootsteps() {
+      if (!this._footsteps || this._footsteps.paused) return;
+      this._footsteps.pause();
+      this._footsteps.currentTime = 0;
+    },
+
+    // Round-robins through the pool so overlapping shots never cut each other.
+    playOnce(name, volume = 1) {
+      if (!this._ready) return;
+      if (name === 'shoot') {
+        const snd = this._shootPool[this._shootIdx % this._shootPool.length];
+        this._shootIdx++;
+        snd.volume = Math.min(1, volume);
+        snd.currentTime = 0;
+        snd.play().catch(() => {});
+      } else if (name === 'fireball') {
+        const snd = this._fireballPool[this._fireballIdx % this._fireballPool.length];
+        this._fireballIdx++;
+        snd.volume = Math.min(1, volume);
+        snd.currentTime = 0;
+        snd.play().catch(() => {});
+      } else if (name === 'death') {
+        this._death.currentTime = 0;
+        this._death.volume = Math.min(1, volume);
+        this._death.play().catch(() => {});
+      }
+    },
+  };
+
+  // ----------------------- Orb Magnet System ----------------------------- //
+  const ORB_MAGNET_RADIUS = 160;  // world units — orbs start pulling toward player
+  const ORB_MAX_SPEED     = 340;  // max pull speed when very close
+
+  function orbMagnetSystem(dt) {
+    const pt = ECS.get(Game.playerId, 'Transform');
+    for (const oid of ECS.query('SoulOrb', 'Transform')) {
+      const ot = ECS.get(oid, 'Transform');
+      const dx = pt.x - ot.x;
+      const dy = pt.y - ot.y;
+      const d = Math.hypot(dx, dy);
+      if (d > ORB_MAGNET_RADIUS || d < 0.5) continue;
+      // Quadratic pull: faster the closer it is.
+      const t = 1 - d / ORB_MAGNET_RADIUS;        // 0 at edge, 1 at center
+      const spd = 60 + t * t * (ORB_MAX_SPEED - 60);
+      ot.x += (dx / d) * spd * dt;
+      ot.y += (dy / d) * spd * dt;
+    }
+  }
+
+  // ----------------------- Tilemap Background ---------------------------- //
+  const TILE_SRC  = 16;   // native pixel size in the sheet
+  const TILE_DRAW = 32;   // rendered px on canvas (2× upscale, before ZOOM)
+
+  // Dark sparkle floor tiles — matched to the reference images:
+  //   [0,96]  = col 0, row 6 → dark navy with pink cross/star sparkle shapes
+  //   [16,80] = col 1, row 5 → dark navy with scattered small pink dot sparkles
+  // 70 / 30 blend for subtle, space-like floor variety.
+  const FLOOR_TILES = [[0,96],[16,80]];
+  function tileVariant(tx, ty) {
+    let h = (Math.imul(tx, 374761393) ^ Math.imul(ty, 668265263)) >>> 0;
+    h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0;
+    return (h % 10) < 7 ? 0 : 1;   // 70 / 30
+  }
+
+  const tilesetImg = new Image();
+  tilesetImg.src = 'CosmicLilac_Tiles.png';
+
+  // ----------------------- Sprite Animation ----------------------------- //
+  // Frames are 48×48 RGBA PNGs, 6 per direction, 8 directions.
+  // "north" lives in a hash-suffixed folder; everything else matches the dir name.
+  const SPRITE_BASE        = 'sprites/pixel_sorceror/animations/walk/';
+  const SPRITE_FRAME_COUNT = 6;
+  const SPRITE_FPS         = 8;    // walk cycle speed (frames/sec)
+  const SPRITE_SIZE        = 48;   // native px
+  const SPRITE_DRAW        = 64;   // rendered px on canvas (1.33× crisp upscale)
+
+  // Map each logical direction to its folder name on disk.
+  const DIR_TO_FOLDER = {
+    'north':      'north-a7b50d28',
+    'north-east': 'north-east',
+    'east':       'east',
+    'south-east': 'south-east',
+    'south':      'south',
+    'south-west': 'south-west',
+    'west':       'west',
+    'north-west': 'north-west',
+  };
+
+  // SpriteFrames['south'] = [Image, Image, Image, Image, Image, Image]
+  const SpriteFrames = {};
+  for (const [dir, folder] of Object.entries(DIR_TO_FOLDER)) {
+    SpriteFrames[dir] = [];
+    for (let i = 0; i < SPRITE_FRAME_COUNT; i++) {
+      const img = new Image();
+      img.src = `${SPRITE_BASE}${folder}/frame_${String(i).padStart(3, '0')}.png`;
+      SpriteFrames[dir].push(img);
+    }
+  }
+
+  // ----------------------- Enemy Sprites -------------------------------- //
+  // Keyed by enemy archetype type -> { direction -> Image[] }.
+  // Only available directions need entries; missing ones fall back to 'south'.
+  // Extensible: just add more direction keys as new sprite sheets arrive.
+  const ENEMY_SPRITE_FPS  = 10;   // slightly faster than the player (flappy wings)
+  const ENEMY_SPRITE_BASE = 'sprites/';
+
+  const EnemySpriteData = {
+    fire_bat: {
+      drawSize: 52,   // rendered px on canvas (native is 92, scaled down to match radius)
+      dirs: {
+        south: { folder: 'fire_bat/south', frameCount: 7 },
+      },
+    },
+    frost_slime: {
+      drawSize: 144,  // native frame is 64×64; doubled for strong visual presence
+      // Spritesheet: 384×256, 64×64 per frame, 6 cols × 4 rows.
+      // Row 0 = upright idle animation (6 frames).
+      sheet: {
+        src: 'sprites/frost_slime/Slime2_Idle_body.png',
+        frameW: 64, frameH: 64,
+        cols: 6, row: 0,
+      },
+    },
+    stone_golem: {
+      drawSize: 90,   // native frame is 16×16; scaled up to match the golem's radius-18 footprint
+      // Spritesheet: 48×48, 16×16 per frame, 3 cols × 3 rows = 9 frames (last is empty).
+      sheet: {
+        src: 'sprites/stone_golemn/Golem Idle (No shading).png',
+        frameW: 16, frameH: 16,
+        cols: 3, rows: 3,
+        totalFrames: 8,   // skip the blank 9th frame
+      },
+    },
+  };
+
+  // Preload all enemy frames.
+  const EnemySprites = {};   // EnemySprites['fire_bat']['south'] = [Image, ...]
+  for (const [type, data] of Object.entries(EnemySpriteData)) {
+    EnemySprites[type] = {};
+
+    if (data.dirs) {
+      // Individual-file approach (fire_bat etc.)
+      for (const [dirKey, info] of Object.entries(data.dirs)) {
+        EnemySprites[type][dirKey] = [];
+        for (let i = 0; i < info.frameCount; i++) {
+          const img = new Image();
+          img.src = `${ENEMY_SPRITE_BASE}${info.folder}/frame_${String(i).padStart(3, '0')}.png`;
+          EnemySprites[type][dirKey].push(img);
+        }
+      }
+    }
+
+    if (data.sheet) {
+      // Spritesheet approach — crop each frame into an offscreen canvas on load.
+      // Supports single-row sheets (cols + row) and multi-row sheets (cols + rows + totalFrames).
+      const { src, frameW, frameH, cols, rows, row, totalFrames } = data.sheet;
+      const sheetImg = new Image();
+      EnemySprites[type]['south'] = [];  // populated in onload
+      sheetImg.onload = () => {
+        const numRows   = rows ?? 1;
+        const startRow  = row  ?? 0;
+        const maxFrames = totalFrames ?? (cols * numRows);
+        let count = 0;
+        outer: for (let r = startRow; r < startRow + numRows; r++) {
+          for (let c = 0; c < cols; c++) {
+            if (count >= maxFrames) break outer;
+            const oc = document.createElement('canvas');
+            oc.width  = frameW;
+            oc.height = frameH;
+            oc.getContext('2d').drawImage(
+              sheetImg,
+              c * frameW, r * frameH, frameW, frameH,
+              0, 0, frameW, frameH
+            );
+            EnemySprites[type]['south'].push(oc);
+            count++;
+          }
+        }
+      };
+      sheetImg.src = src;
+    }
+  }
+
+  /**
+   * Get the current sprite frame Image for an enemy, or null if none available.
+   * Falls back to 'south' when the enemy's facing direction has no sprite yet.
+   */
+  function getEnemySpriteFrame(type) {
+    const sprMap = EnemySprites[type];
+    if (!sprMap) return null;
+    const frames = sprMap['south'];
+    if (!frames || frames.length === 0) return null;
+    const frameIdx = Math.floor(Game.time * ENEMY_SPRITE_FPS) % frames.length;
+    const frame = frames[frameIdx];
+    if (!frame) return null;
+    // Offscreen canvases (sheet-based enemies) are always ready to draw.
+    if (frame instanceof HTMLCanvasElement) return frame;
+    // Individual Image files — wait until fully loaded.
+    return (frame.complete && frame.naturalWidth > 0) ? frame : null;
+  }
+
+  // -------------------- Fireball Projectile Frames ----------------------- //
+  // 5 frames, 64×32 each: effects/fireball/FB001.png … FB005.png
+  // Each PNG is loaded into an offscreen canvas so it is immediately drawable
+  // (avoids the img.complete / naturalWidth timing pitfall for palette PNGs).
+  const FIREBALL_FRAMES = [];     // filled with HTMLCanvasElement on image load
+  const FIREBALL_FRAME_COUNT = 5;
+  const FIREBALL_FPS = 14;        // animation speed (frames/sec)
+  const FIREBALL_DRAW_W = 56;     // rendered width on canvas
+  const FIREBALL_DRAW_H = 28;     // rendered height (keeps 2:1 aspect)
+  for (let i = 1; i <= FIREBALL_FRAME_COUNT; i++) {
+    const frameIndex = i - 1;
+    const img = new Image();
+    img.onload = () => {
+      const oc = document.createElement('canvas');
+      oc.width  = img.naturalWidth;
+      oc.height = img.naturalHeight;
+      oc.getContext('2d').drawImage(img, 0, 0);
+      FIREBALL_FRAMES[frameIndex] = oc;   // store at fixed index, immediately drawable
+    };
+    img.src = `effects/fireball/FB${String(i).padStart(3, '0')}.png`;
+  }
+
+  // 8 direction keys in CCW order starting from East (atan2 sector 0).
+  const DIR_KEYS = ['east','south-east','south','south-west','west','north-west','north','north-east'];
+
+  /**
+   * Convert a velocity vector to one of the 8 direction strings.
+   * Returns null when both components are zero.
+   * NOTE: +Y is DOWN in screen/world space.
+   */
+  function velToDir(vx, vy) {
+    if (vx === 0 && vy === 0) return null;
+    let deg = Math.atan2(vy, vx) * 180 / Math.PI; // -180..180, 0=east, 90=south
+    if (deg < 0) deg += 360;                        // 0..360
+    const sector = Math.round(deg / 45) % 8;        // 0=east … 7=north-east
+    return DIR_KEYS[sector];
+  }
+
+  // --------------------------- Game State ------------------------------- //
+  const Game = {
+    time: 0,
+    kills: 0,
+    playerId: null,
+    currentAbilityKind: 'basic_bolt',
+    currentAbilityName: 'Basic Bolt',
+    spawnTimer: 0,
+    spawnInterval: 1.2,
+    paused: false,
+    pendingSwap: null, // { orbId, sourceType }
+    gameOver: false,
+    playerDir: 'south',   // last known facing direction for sprite selection
+    animFrame: 0,         // current walk-cycle frame index (0–5)
+    animTimer: 0,         // time accumulator for frame stepping
+  };
+
+  // --------------------------- Archetypes ------------------------------- //
+  const EnemyArchetypes = {
+    fire_bat: {
+      name: 'Fire Bat',
+      color: '#ff6b3d', stroke: '#8a2a10',
+      radius: 10, speed: 95, hp: 14,
+      ability: 'fireball',
+      abilityCooldown: 2.2,
+      abilityRange: 360,
+      contactDps: 10,
+    },
+    frost_slime: {
+      name: 'Frost Slime',
+      color: '#6bd7ff', stroke: '#1b6f8f',
+      radius: 14, speed: 55, hp: 28,
+      ability: 'frost_trail',
+      abilityCooldown: 0.35, // drops trail blobs frequently
+      abilityRange: 0,
+      contactDps: 8,
+    },
+    stone_golem: {
+      name: 'Stone Golem',
+      color: '#9aa1a8', stroke: '#3a3f45',
+      radius: 18, speed: 40, hp: 60,
+      ability: 'aoe_pulse',
+      abilityCooldown: 3.2,
+      abilityRange: 140, // trigger distance
+      contactDps: 16,
+    },
+  };
+
+  // Player weapon definitions.  Each maps Weapon.kind -> runtime stats + label.
+  const PlayerWeapons = {
+    basic_bolt: {
+      name: 'Basic Bolt',
+      cooldown: 0.55, projectileSpeed: 520, damage: 8, range: 600,
+      projColor: '#fff8a8', projStroke: '#8aa0ff', projRadius: 4,
+      mode: 'aimed',
+    },
+    fireball: {
+      name: 'Fireball',
+      cooldown: 0.8, projectileSpeed: 440, damage: 16, range: 600,
+      projColor: '#ff8a3d', projStroke: '#ffd28a', projRadius: 7,
+      splashRadius: 42, splashDamage: 10,
+      mode: 'aimed',
+    },
+    frost_trail: {
+      name: 'Frost Trail',
+      cooldown: 0.12, // how often we drop a frost blob while moving
+      trailRadius: 46, trailTtl: 2.6, trailSlow: 0.4, trailColor: 'rgba(120,220,255,0.22)',
+      // Also fires a small frost shard toward the cursor on a slower timer:
+      shardCooldown: 0.9, shardDamage: 6, shardSpeed: 380, shardRadius: 5,
+      shardColor: '#bfefff', shardStroke: '#2e9fd6',
+      mode: 'trail+shard',
+    },
+    aoe_pulse: {
+      name: 'AoE Pulse',
+      cooldown: 1.5, maxRadius: 180, growSpeed: 520, damage: 14,
+      color: 'rgba(200,140,255,0.55)',
+      mode: 'pulse',
+    },
+  };
+
+  // --------------------------- Helpers ---------------------------------- //
+  function abilityLabelFromKind(kind) {
+    const w = PlayerWeapons[kind];
+    return w ? w.name : kind;
+  }
+
+  function setAbility(kind) {
+    Game.currentAbilityKind = kind;
+    Game.currentAbilityName = abilityLabelFromKind(kind);
+    const w = ECS.get(Game.playerId, 'Weapon');
+    const def = PlayerWeapons[kind];
+    if (w && def) {
+      w.kind = kind;
+      // Per-mode timer refresh.
+      w.cooldown = def.cooldown;
+      w.timer = 0;
+      // Secondary cooldowns for modes that need them.
+      w.secondary = def.shardCooldown != null ? { timer: 0, cooldown: def.shardCooldown } : null;
+    }
+  }
+
+  // --------------------------- Player ----------------------------------- //
+  function createPlayer() {
+    const id = ECS.createEntity();
+    ECS.add(id, 'Transform', { x: 0, y: 0 });
+    ECS.add(id, 'Velocity', { x: 0, y: 0 });
+    ECS.add(id, 'Renderable', {
+      kind: 'circle',
+      color: '#e8ecff', strokeColor: '#8aa0ff',
+      radius: 12,
+    });
+    ECS.add(id, 'Health', { hp: 100, max: 100 });
+    ECS.add(id, 'PlayerTag', {});
+    ECS.add(id, 'Collider', { radius: 12 });
+    ECS.add(id, 'Weapon', {
+      kind: 'basic_bolt',
+      cooldown: PlayerWeapons.basic_bolt.cooldown,
+      timer: 0,
+      secondary: null,
+    });
+    return id;
+  }
+
+  // --------------------------- Spawning --------------------------------- //
+  function spawnEnemy(typeKey) {
+    const arch = EnemyArchetypes[typeKey];
+    const player = ECS.get(Game.playerId, 'Transform');
+    const margin = 60;
+    const ringR = Math.hypot(VIEW_W, VIEW_H) / 2 + margin;
+    const a = Math.random() * Math.PI * 2;
+    const x = player.x + Math.cos(a) * ringR;
+    const y = player.y + Math.sin(a) * ringR;
+
+    const id = ECS.createEntity();
+    ECS.add(id, 'Transform', { x, y });
+    ECS.add(id, 'Velocity', { x: 0, y: 0 });
+    ECS.add(id, 'Renderable', {
+      kind: 'circle',
+      color: arch.color,
+      strokeColor: arch.stroke,
+      radius: arch.radius,
+    });
+    ECS.add(id, 'Health', { hp: arch.hp, max: arch.hp });
+    ECS.add(id, 'EnemyTag', { type: typeKey, contactDps: arch.contactDps });
+    ECS.add(id, 'Mover', { speed: arch.speed });
+    ECS.add(id, 'Collider', { radius: arch.radius });
+    ECS.add(id, 'EnemyAbility', {
+      kind: arch.ability,
+      timer: Math.random() * arch.abilityCooldown, // desync so swarms don't fire in unison
+      cooldown: arch.abilityCooldown,
+      range: arch.abilityRange,
+    });
+    return id;
+  }
+
+  function spawnSystem(dt) {
+    Game.spawnTimer -= dt;
+    Game.spawnInterval = Math.max(0.25, 1.3 - Game.time * 0.01);
+    if (Game.spawnTimer <= 0) {
+      Game.spawnTimer = Game.spawnInterval;
+      const roll = Math.random();
+      const t = Game.time;
+      let typeKey;
+      if (t < 15) {
+        typeKey = roll < 0.8 ? 'fire_bat' : 'frost_slime';
+      } else if (t < 45) {
+        typeKey = roll < 0.55 ? 'fire_bat' : roll < 0.9 ? 'frost_slime' : 'stone_golem';
+      } else {
+        typeKey = roll < 0.4 ? 'fire_bat' : roll < 0.75 ? 'frost_slime' : 'stone_golem';
+      }
+      const burst = (Math.random() < 0.15) ? 3 : 1;
+      for (let i = 0; i < burst; i++) spawnEnemy(typeKey);
+    }
+  }
+
+  // --------------------------- Systems ---------------------------------- //
+  const PLAYER_SPEED = 210;
+  const ZOOM         = 1.5;  // global camera zoom — scales the entire canvas render
+
+  function playerMovementSystem(dt) {
+    const id = Game.playerId;
+    const t = ECS.get(id, 'Transform');
+    const v = ECS.get(id, 'Velocity');
+    const ax = Input.axis();
+    v.x = ax.x * PLAYER_SPEED;
+    v.y = ax.y * PLAYER_SPEED;
+    t.x += v.x * dt;
+    t.y += v.y * dt;
+    Camera.x = t.x;
+    Camera.y = t.y;
+    // Update facing direction, walk-cycle frame, and footstep audio.
+    const dir = velToDir(v.x, v.y);
+    if (dir) {
+      Game.playerDir = dir;
+      // Advance animation frame at SPRITE_FPS while moving.
+      Game.animTimer += dt;
+      const frameDur = 1 / SPRITE_FPS;
+      if (Game.animTimer >= frameDur) {
+        Game.animTimer -= frameDur;
+        Game.animFrame = (Game.animFrame + 1) % SPRITE_FRAME_COUNT;
+      }
+      GameAudio.startFootsteps();
+    } else {
+      // Idle: reset to frame 0, stop timer, stop footsteps.
+      Game.animFrame = 0;
+      Game.animTimer = 0;
+      GameAudio.stopFootsteps();
+    }
+  }
+
+  // Enemies chase the player; apply Slowed modifier if present.
+  function enemyMoveSystem(dt) {
+    const player = ECS.get(Game.playerId, 'Transform');
+    for (const id of ECS.query('EnemyTag', 'Transform', 'Mover')) {
+      const t = ECS.get(id, 'Transform');
+      const m = ECS.get(id, 'Mover');
+      const sl = ECS.get(id, 'Slowed');
+      const factor = sl ? sl.factor : 1;
+      const dx = player.x - t.x;
+      const dy = player.y - t.y;
+      const d = Math.hypot(dx, dy) || 1;
+      t.x += (dx / d) * m.speed * factor * dt;
+      t.y += (dy / d) * m.speed * factor * dt;
+    }
+  }
+
+  // Tick down Slowed timers.
+  function slowedDecaySystem(dt) {
+    for (const id of ECS.query('Slowed')) {
+      const s = ECS.get(id, 'Slowed');
+      s.ttl -= dt;
+      if (s.ttl <= 0) ECS.remove(id, 'Slowed');
+    }
+  }
+
+  // -------------------- Player Weapon (fires toward cursor) -------------- //
+  function spawnPlayerProjectile(fromX, fromY, dirX, dirY, def, variant) {
+    // variant allows modes like fireball vs frost_shard vs basic
+    const id = ECS.createEntity();
+    ECS.add(id, 'Transform', { x: fromX, y: fromY });
+    const speed = variant === 'shard'
+      ? def.shardSpeed : def.projectileSpeed;
+    ECS.add(id, 'Velocity', { x: dirX * speed, y: dirY * speed });
+    const r = variant === 'shard' ? def.shardRadius : def.projRadius;
+    ECS.add(id, 'Renderable', {
+      kind: 'circle',
+      color: variant === 'shard' ? def.shardColor : def.projColor,
+      strokeColor: variant === 'shard' ? def.shardStroke : def.projStroke,
+      radius: r,
+      glow: def.mode === 'aimed' && def.splashRadius ? true : false,
+    });
+    const dmg = variant === 'shard' ? def.shardDamage : def.damage;
+    ECS.add(id, 'Projectile', {
+      damage: dmg,
+      ownerTag: 'player',
+      kind: variant || def.mode,           // 'bolt' | 'fireball' | 'shard'
+      splashRadius: def.splashRadius || 0,
+      splashDamage: def.splashDamage || 0,
+    });
+    ECS.add(id, 'Collider', { radius: r });
+    ECS.add(id, 'Lifetime', { ttl: 1.4 });
+  }
+
+  function spawnFrostTrailBlob(x, y, def) {
+    const id = ECS.createEntity();
+    ECS.add(id, 'Transform', { x, y });
+    ECS.add(id, 'Renderable', { kind: 'aura', color: def.trailColor, radius: def.trailRadius });
+    ECS.add(id, 'SlowField', { radius: def.trailRadius, slowFactor: def.trailSlow });
+    ECS.add(id, 'Lifetime', { ttl: def.trailTtl });
+  }
+
+  function spawnAoeShockwave(x, y, def, ownerTag, damageOverride) {
+    const id = ECS.createEntity();
+    ECS.add(id, 'Transform', { x, y });
+    ECS.add(id, 'AoeShockwave', {
+      radius: 6,
+      maxRadius: def.maxRadius || 140,
+      growSpeed: def.growSpeed || 420,
+      damage: damageOverride != null ? damageOverride : def.damage,
+      hitSet: new Set(),
+      color: def.color || 'rgba(200,140,255,0.55)',
+      ownerTag,
+    });
+  }
+
+  function weaponSystem(dt) {
+    for (const id of ECS.query('Weapon', 'Transform', 'PlayerTag')) {
+      const w = ECS.get(id, 'Weapon');
+      const t = ECS.get(id, 'Transform');
+      const def = PlayerWeapons[w.kind];
+      if (!def) continue;
+
+      w.timer -= dt;
+
+      if (def.mode === 'aimed') {
+        if (w.timer <= 0) {
+          const dir = Input.aimDir();
+          const isFire = w.kind === 'fireball';
+          spawnPlayerProjectile(t.x, t.y, dir.x, dir.y, def, isFire ? 'fireball' : 'bolt');
+          GameAudio.playOnce(isFire ? 'fireball' : 'shoot', 0.35);
+          w.timer = def.cooldown;
+        }
+      } else if (def.mode === 'trail+shard') {
+        if (w.timer <= 0) {
+          // drop a frost blob only while moving
+          const v = ECS.get(id, 'Velocity');
+          if (v.x !== 0 || v.y !== 0) spawnFrostTrailBlob(t.x, t.y, def);
+          w.timer = def.cooldown;
+        }
+        if (w.secondary) {
+          w.secondary.timer -= dt;
+          if (w.secondary.timer <= 0) {
+            const dir = Input.aimDir();
+            spawnPlayerProjectile(t.x, t.y, dir.x, dir.y, def, 'shard');
+            GameAudio.playOnce('shoot', 0.25);
+            w.secondary.timer = w.secondary.cooldown;
+          }
+        }
+      } else if (def.mode === 'pulse') {
+        if (w.timer <= 0) {
+          spawnAoeShockwave(t.x, t.y, def, 'player');
+          GameAudio.playOnce('shoot', 0.35);
+          w.timer = def.cooldown;
+        }
+      }
+    }
+  }
+
+  // -------------------- Enemy Ability System ----------------------------- //
+  function enemyAbilitySystem(dt) {
+    const player = ECS.get(Game.playerId, 'Transform');
+    for (const id of ECS.query('EnemyTag', 'Transform', 'EnemyAbility')) {
+      const t = ECS.get(id, 'Transform');
+      const ab = ECS.get(id, 'EnemyAbility');
+      ab.timer -= dt;
+
+      if (ab.kind === 'fireball') {
+        if (ab.timer <= 0) {
+          const dx = player.x - t.x, dy = player.y - t.y;
+          const d = Math.hypot(dx, dy);
+          if (d > 0 && d < ab.range) {
+            const dir = { x: dx / d, y: dy / d };
+            spawnEnemyFireball(t.x, t.y, dir);
+            ab.timer = ab.cooldown;
+          } else {
+            ab.timer = 0.35; // retry soon
+          }
+        }
+      } else if (ab.kind === 'frost_trail') {
+        if (ab.timer <= 0) {
+          spawnEnemyFrostBlob(t.x, t.y);
+          ab.timer = ab.cooldown;
+        }
+      } else if (ab.kind === 'aoe_pulse') {
+        if (ab.timer <= 0) {
+          const dx = player.x - t.x, dy = player.y - t.y;
+          if (dx*dx + dy*dy < ab.range * ab.range) {
+            spawnAoeShockwave(t.x, t.y,
+              { maxRadius: 150, growSpeed: 360, damage: 18, color: 'rgba(255,210,120,0.55)' },
+              'enemy');
+            ab.timer = ab.cooldown;
+          } else {
+            ab.timer = 0.5;
+          }
+        }
+      }
+    }
+  }
+
+  function spawnEnemyFireball(x, y, dir) {
+    const id = ECS.createEntity();
+    ECS.add(id, 'Transform', { x, y });
+    ECS.add(id, 'Velocity', { x: dir.x * 280, y: dir.y * 280 });
+    ECS.add(id, 'Renderable', { kind: 'circle', color: '#ff7a3a', strokeColor: '#ffd28a', radius: 6, glow: true });
+    ECS.add(id, 'Projectile', { damage: 12, ownerTag: 'enemy', kind: 'fireball' });
+    ECS.add(id, 'Collider', { radius: 6 });
+    ECS.add(id, 'Lifetime', { ttl: 2.2 });
+  }
+
+  function spawnEnemyFrostBlob(x, y) {
+    const id = ECS.createEntity();
+    ECS.add(id, 'Transform', { x, y });
+    ECS.add(id, 'Renderable', { kind: 'aura', color: 'rgba(140,220,255,0.18)', radius: 34 });
+    ECS.add(id, 'SlowField', { radius: 34, slowFactor: 0.4, damagesPlayer: true });
+    ECS.add(id, 'Lifetime', { ttl: 3.0 });
+  }
+
+  // -------------------- Shockwaves (AoE) --------------------------------- //
+  function shockwaveSystem(dt) {
+    const player = ECS.get(Game.playerId, 'Transform');
+    const playerH = ECS.get(Game.playerId, 'Health');
+    const playerC = ECS.get(Game.playerId, 'Collider');
+    for (const id of ECS.query('Transform', 'AoeShockwave')) {
+      const t = ECS.get(id, 'Transform');
+      const sw = ECS.get(id, 'AoeShockwave');
+      sw.radius += sw.growSpeed * dt;
+      if (sw.radius >= sw.maxRadius) {
+        ECS.destroyEntity(id);
+        continue;
+      }
+      const innerR = Math.max(0, sw.radius - 14); // ring thickness
+      if (sw.ownerTag === 'player') {
+        for (const eid of ECS.query('EnemyTag', 'Transform', 'Collider', 'Health')) {
+          if (sw.hitSet.has(eid)) continue;
+          const et = ECS.get(eid, 'Transform');
+          const ec = ECS.get(eid, 'Collider');
+          const dx = et.x - t.x, dy = et.y - t.y;
+          const d = Math.hypot(dx, dy);
+          if (d <= sw.radius + ec.radius && d >= innerR - ec.radius) {
+            const h = ECS.get(eid, 'Health');
+            h.hp -= sw.damage;
+            sw.hitSet.add(eid);
+            if (h.hp <= 0) onEnemyKilled(eid);
+          }
+        }
+      } else {
+        // enemy shockwave can hurt player once per wave
+        if (!sw.hitSet.has(Game.playerId)) {
+          const dx = player.x - t.x, dy = player.y - t.y;
+          const d = Math.hypot(dx, dy);
+          if (d <= sw.radius + playerC.radius && d >= innerR - playerC.radius) {
+            playerH.hp -= sw.damage;
+            sw.hitSet.add(Game.playerId);
+          }
+        }
+      }
+    }
+  }
+
+  // -------------------- Projectile + Lifetime ---------------------------- //
+  function projectileSystem(dt) {
+    for (const id of ECS.query('Projectile', 'Transform', 'Velocity')) {
+      const t = ECS.get(id, 'Transform');
+      const v = ECS.get(id, 'Velocity');
+      t.x += v.x * dt;
+      t.y += v.y * dt;
+    }
+  }
+
+  function lifetimeSystem(dt) {
+    for (const id of ECS.query('Lifetime')) {
+      const L = ECS.get(id, 'Lifetime');
+      L.ttl -= dt;
+      if (L.ttl <= 0) ECS.destroyEntity(id);
+    }
+  }
+
+  // -------------------- Collisions --------------------------------------- //
+  function onEnemyKilled(eid) {
+    const tag = ECS.get(eid, 'EnemyTag');
+    const et  = ECS.get(eid, 'Transform');
+    const ren = ECS.get(eid, 'Renderable');
+    if (tag && et) {
+      // Death particle burst using the enemy's own color.
+      const arch = EnemyArchetypes[tag.type];
+      const count = tag.type === 'stone_golem' ? 18 : tag.type === 'frost_slime' ? 13 : 10;
+      spawnDeathParticles(et.x, et.y, arch ? arch.color : '#ffffff', count);
+      GameAudio.playOnce('death', 0.5);
+      // Small VFX ring pop at death position.
+      spawnVfxRing(et.x, et.y, {
+        maxRadius: (ren ? ren.radius : 12) * 3.5,
+        growSpeed: 260,
+        color: arch ? arch.color : '#ffffff',
+        life: 0.35,
+        lineWidth: 2,
+      });
+      // 20% Soul Orb drop
+      if (Math.random() < 0.20) {
+        spawnSoulOrb(et.x, et.y, tag.type);
+      }
+    }
+    ECS.destroyEntity(eid);
+    Game.kills++;
+  }
+
+  function spawnSoulOrb(x, y, sourceType) {
+    const id = ECS.createEntity();
+    ECS.add(id, 'Transform', { x, y });
+    ECS.add(id, 'Renderable', { kind: 'orb', color: '#bcd0ff', radius: 9 });
+    ECS.add(id, 'Collider', { radius: 12 });
+    ECS.add(id, 'SoulOrb', { sourceType });
+    ECS.add(id, 'Lifetime', { ttl: 15 }); // orbs linger but expire eventually
+  }
+
+  function collisionSystem(dt) {
+    const playerT = ECS.get(Game.playerId, 'Transform');
+    const playerH = ECS.get(Game.playerId, 'Health');
+    const playerC = ECS.get(Game.playerId, 'Collider');
+
+    // Player projectiles -> enemies (with optional splash for fireballs)
+    for (const pid of ECS.query('Projectile', 'Transform', 'Collider')) {
+      const proj = ECS.get(pid, 'Projectile');
+      if (proj.ownerTag !== 'player') continue;
+      const pt = ECS.get(pid, 'Transform');
+      const pc = ECS.get(pid, 'Collider');
+      let hitEid = -1;
+      for (const eid of ECS.query('EnemyTag', 'Transform', 'Collider', 'Health')) {
+        const et = ECS.get(eid, 'Transform');
+        const ec = ECS.get(eid, 'Collider');
+        const r = pc.radius + ec.radius;
+        const dx = pt.x - et.x, dy = pt.y - et.y;
+        if (dx*dx + dy*dy <= r*r) { hitEid = eid; break; }
+      }
+      if (hitEid !== -1) {
+        const h = ECS.get(hitEid, 'Health');
+        h.hp -= proj.damage;
+        // Hit spark at impact point, colored by projectile.
+        const pr = ECS.get(pid, 'Renderable');
+        spawnHitSpark(pt.x, pt.y, pr ? pr.color : '#ffffff');
+        // Fireball splash + extra VFX ring.
+        if (proj.splashRadius > 0) {
+          spawnVfxRing(pt.x, pt.y, {
+            maxRadius: proj.splashRadius * 1.1,
+            growSpeed: 380,
+            color: '#ff9a5a',
+            life: 0.25,
+            lineWidth: 3,
+          });
+          for (const eid of ECS.query('EnemyTag', 'Transform', 'Health')) {
+            if (eid === hitEid) continue;
+            const et = ECS.get(eid, 'Transform');
+            const dx = et.x - pt.x, dy = et.y - pt.y;
+            if (dx*dx + dy*dy <= proj.splashRadius * proj.splashRadius) {
+              const eh = ECS.get(eid, 'Health');
+              eh.hp -= proj.splashDamage;
+              if (eh.hp <= 0) onEnemyKilled(eid);
+            }
+          }
+        }
+        ECS.destroyEntity(pid);
+        if (h.hp <= 0) onEnemyKilled(hitEid);
+      }
+    }
+
+    // Enemy projectiles -> player
+    for (const pid of ECS.query('Projectile', 'Transform', 'Collider')) {
+      const proj = ECS.get(pid, 'Projectile');
+      if (proj.ownerTag !== 'enemy') continue;
+      const pt = ECS.get(pid, 'Transform');
+      const pc = ECS.get(pid, 'Collider');
+      const r = pc.radius + playerC.radius;
+      const dx = pt.x - playerT.x, dy = pt.y - playerT.y;
+      if (dx*dx + dy*dy <= r*r) {
+        playerH.hp -= proj.damage;
+        // Red-tinted sparks on player hit.
+        spawnHitSpark(playerT.x, playerT.y, '#ff6060');
+        ECS.destroyEntity(pid);
+      }
+    }
+
+    // Enemy body contact damage
+    for (const eid of ECS.query('EnemyTag', 'Transform', 'Collider')) {
+      const et = ECS.get(eid, 'Transform');
+      const ec = ECS.get(eid, 'Collider');
+      const r = playerC.radius + ec.radius;
+      const dx = playerT.x - et.x, dy = playerT.y - et.y;
+      if (dx*dx + dy*dy <= r*r) {
+        const tag = ECS.get(eid, 'EnemyTag');
+        playerH.hp -= (tag.contactDps || 10) * dt;
+      }
+    }
+
+    // Slow fields -> enemies (player frost trail), or -> player (enemy frost blob)
+    for (const fid of ECS.query('SlowField', 'Transform')) {
+      const ft = ECS.get(fid, 'Transform');
+      const sf = ECS.get(fid, 'SlowField');
+      // Enemies in range get Slowed
+      for (const eid of ECS.query('EnemyTag', 'Transform')) {
+        const et = ECS.get(eid, 'Transform');
+        const dx = et.x - ft.x, dy = et.y - ft.y;
+        if (dx*dx + dy*dy <= sf.radius * sf.radius) {
+          const existing = ECS.get(eid, 'Slowed');
+          if (!existing || existing.factor > sf.slowFactor) {
+            ECS.add(eid, 'Slowed', { factor: sf.slowFactor, ttl: 0.4 });
+          } else {
+            existing.ttl = 0.4;
+          }
+        }
+      }
+      // Player standing in enemy frost -> small damage over time
+      if (sf.damagesPlayer) {
+        const dx = playerT.x - ft.x, dy = playerT.y - ft.y;
+        if (dx*dx + dy*dy <= sf.radius * sf.radius) {
+          playerH.hp -= 6 * dt;
+        }
+      }
+    }
+
+    // Soul Orb pickup -> pause + swap prompt
+    for (const oid of ECS.query('SoulOrb', 'Transform', 'Collider')) {
+      const ot = ECS.get(oid, 'Transform');
+      const oc = ECS.get(oid, 'Collider');
+      const r = oc.radius + playerC.radius;
+      const dx = playerT.x - ot.x, dy = playerT.y - ot.y;
+      if (dx*dx + dy*dy <= r*r) {
+        const orb = ECS.get(oid, 'SoulOrb');
+        openSwapPrompt(oid, orb.sourceType);
+        break; // one at a time
+      }
+    }
+  }
+
+  // --------------------------- Soul Swap UI ----------------------------- //
+  const swapEl = document.getElementById('swap');
+  const keepNameEl = document.getElementById('keep-name');
+  const keepDescEl = document.getElementById('keep-desc');
+  const swapNameEl = document.getElementById('swap-name');
+  const swapDescEl = document.getElementById('swap-desc');
+  const swapSubEl  = document.getElementById('swap-sub');
+
+  const abilityBlurb = {
+    basic_bolt:  'Reliable yellow bolt toward cursor.',
+    fireball:    'Slower-firing orange projectile with small splash damage.',
+    frost_trail: 'Leaves a slowing frost trail while moving, plus a frost shard toward cursor.',
+    aoe_pulse:   'Periodic expanding shockwave around you that damages all enemies in its ring.',
+  };
+
+  function openSwapPrompt(orbId, sourceType) {
+    const arch = EnemyArchetypes[sourceType];
+    const newKind = arch.ability;
+    // Pickup flash: two concentric rings burst outward at player position.
+    const pt = ECS.get(Game.playerId, 'Transform');
+    spawnVfxRing(pt.x, pt.y, { maxRadius: 80, growSpeed: 420, color: '#d0e8ff', life: 0.4, lineWidth: 3 });
+    spawnVfxRing(pt.x, pt.y, { maxRadius: 50, growSpeed: 260, color: '#ffffff', life: 0.5, lineWidth: 2, startRadius: 8 });
+    // Burst of white particles at player position.
+    spawnDeathParticles(pt.x, pt.y, '#bcd0ff', 18);
+    Game.paused = true;
+    Game.pendingSwap = { orbId, sourceType, newKind };
+
+    keepNameEl.textContent = abilityLabelFromKind(Game.currentAbilityKind);
+    keepDescEl.textContent = abilityBlurb[Game.currentAbilityKind] || '';
+    swapNameEl.textContent = `Swap → ${abilityLabelFromKind(newKind)}`;
+    swapDescEl.textContent = `From ${arch.name}. ${abilityBlurb[newKind] || ''}`;
+    swapSubEl.textContent = `From a ${arch.name}. Press 1 to keep, 2 to swap.`;
+
+    swapEl.classList.add('on');
+  }
+
+  function resolveSwap(doSwap) {
+    if (!Game.pendingSwap) return;
+    const { orbId, newKind } = Game.pendingSwap;
+    if (doSwap) setAbility(newKind);
+    ECS.destroyEntity(orbId);
+    Game.pendingSwap = null;
+    Game.paused = false;
+    swapEl.classList.remove('on');
+  }
+  document.getElementById('opt-keep').addEventListener('click', () => resolveSwap(false));
+  document.getElementById('opt-swap').addEventListener('click', () => resolveSwap(true));
+
+  // --------------------------- Rendering -------------------------------- //
+  function drawBackground() {
+    if (!tilesetImg.complete || tilesetImg.naturalWidth === 0) return;
+
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+
+    // Work out which world-tile column/row is at the top-left of the viewport.
+    const camTileX = Math.floor((Camera.x - VIEW_W / 2) / TILE_DRAW);
+    const camTileY = Math.floor((Camera.y - VIEW_H / 2) / TILE_DRAW);
+
+    // How many tiles fit on screen (+ 2 for partial tiles at edges).
+    const tilesX = Math.ceil(VIEW_W / TILE_DRAW) + 2;
+    const tilesY = Math.ceil(VIEW_H / TILE_DRAW) + 2;
+
+    // Draw tiles dim so the sparkles read as ambient texture, not foreground noise.
+    ctx.globalAlpha = 0.28;
+    for (let dy = 0; dy < tilesY; dy++) {
+      for (let dx = 0; dx < tilesX; dx++) {
+        const tx = camTileX + dx;
+        const ty = camTileY + dy;
+
+        // Screen position of this tile's top-left corner.
+        const sx = (tx * TILE_DRAW) - (Camera.x - VIEW_W / 2);
+        const sy = (ty * TILE_DRAW) - (Camera.y - VIEW_H / 2);
+
+        const [srcX, srcY] = FLOOR_TILES[tileVariant(tx, ty)];
+        ctx.drawImage(
+          tilesetImg,
+          srcX, srcY, TILE_SRC, TILE_SRC,  // source rect in sheet
+          Math.round(sx), Math.round(sy), TILE_DRAW, TILE_DRAW  // dest on canvas
+        );
+      }
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  function renderShockwaves() {
+    for (const id of ECS.query('Transform', 'AoeShockwave')) {
+      const t = ECS.get(id, 'Transform');
+      const sw = ECS.get(id, 'AoeShockwave');
+      const s = worldToScreen(t.x, t.y);
+      ctx.save();
+      ctx.lineWidth = 14;
+      ctx.strokeStyle = sw.color;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, sw.radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function renderEntities() {
+    // Pass 1: auras underneath everything
+    for (const id of ECS.query('Transform', 'Renderable')) {
+      const r = ECS.get(id, 'Renderable');
+      if (r.kind !== 'aura') continue;
+      const t = ECS.get(id, 'Transform');
+      const s = worldToScreen(t.x, t.y);
+      const grad = ctx.createRadialGradient(s.x, s.y, r.radius * 0.1, s.x, s.y, r.radius);
+      grad.addColorStop(0, r.color);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, r.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // Pass 2: circles / orbs / player sprite
+    for (const id of ECS.query('Transform', 'Renderable')) {
+      const r = ECS.get(id, 'Renderable');
+      if (r.kind === 'aura') continue;
+      const t = ECS.get(id, 'Transform');
+      const s = worldToScreen(t.x, t.y);
+      if (s.x < -80 || s.x > VIEW_W + 80 || s.y < -80 || s.y > VIEW_H + 80) continue;
+
+      // ---- Player: draw current PNG animation frame ----
+      if (ECS.has(id, 'PlayerTag')) {
+        const frames = SpriteFrames[Game.playerDir] || SpriteFrames['south'];
+        const img = frames[Game.animFrame] || frames[0];
+        if (img && img.complete && img.naturalWidth > 0) {
+          ctx.save();
+          ctx.imageSmoothingEnabled = false;
+          const half = SPRITE_DRAW / 2;
+
+          // Soft warm glow beneath the player so they lift off the dark background.
+          const glowR = SPRITE_DRAW * 0.72;
+          const grd = ctx.createRadialGradient(s.x, s.y + half * 0.35, 0, s.x, s.y, glowR);
+          grd.addColorStop(0,   'rgba(255, 210, 120, 0.22)');
+          grd.addColorStop(0.5, 'rgba(200, 140, 255, 0.10)');
+          grd.addColorStop(1,   'rgba(0, 0, 0, 0)');
+          ctx.fillStyle = grd;
+          ctx.beginPath();
+          ctx.ellipse(s.x, s.y + half * 0.1, glowR, glowR * 0.65, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.drawImage(img, s.x - half, s.y - half, SPRITE_DRAW, SPRITE_DRAW);
+          ctx.restore();
+        } else {
+          // Fallback circle until frames finish loading
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, r.radius, 0, Math.PI * 2);
+          ctx.fillStyle = r.color;
+          ctx.fill();
+        }
+        continue; // skip the generic circle path
+      }
+
+      // ---- Enemies with sprites ----
+      if (ECS.has(id, 'EnemyTag')) {
+        const tag = ECS.get(id, 'EnemyTag');
+        const img = getEnemySpriteFrame(tag.type);
+        if (img) {
+          const drawSize = EnemySpriteData[tag.type].drawSize;
+          const half = drawSize / 2;
+          ctx.save();
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(img, s.x - half, s.y - half, drawSize, drawSize);
+          ctx.restore();
+          continue; // skip generic circle
+        }
+        // No sprite available — fall through to generic circle below.
+      }
+
+      // ---- Player fireball projectile: animated sprite ----
+      if (ECS.has(id, 'Projectile')) {
+        const proj = ECS.get(id, 'Projectile');
+        if (proj.kind === 'fireball') {
+          const frameIdx = Math.floor(Game.time * FIREBALL_FPS) % FIREBALL_FRAME_COUNT;
+          const fbCanvas = FIREBALL_FRAMES[frameIdx];
+          if (fbCanvas instanceof HTMLCanvasElement && fbCanvas.width > 0 && fbCanvas.height > 0) {
+            const vel = ECS.get(id, 'Velocity');
+            const angle = vel ? Math.atan2(vel.y, vel.x) : 0;
+            ctx.save();
+            ctx.translate(s.x, s.y);
+            ctx.rotate(angle);
+            ctx.imageSmoothingEnabled = false;
+            try {
+              ctx.drawImage(fbCanvas, -FIREBALL_DRAW_W / 2, -FIREBALL_DRAW_H / 2, FIREBALL_DRAW_W, FIREBALL_DRAW_H);
+            } catch (_) { /* frame not ready yet — fall through to circle */ }
+            ctx.restore();
+            continue;
+          }
+        }
+      }
+
+      // ---- Everything else: generic circle / orb ----
+      if (r.glow) {
+        ctx.save();
+        ctx.shadowColor = r.color;
+        ctx.shadowBlur = 14;
+      }
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, r.radius, 0, Math.PI * 2);
+      ctx.fillStyle = r.color;
+      ctx.fill();
+      if (r.strokeColor) {
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = r.strokeColor;
+        ctx.stroke();
+      }
+      if (r.glow) ctx.restore();
+
+      // Soul orb gets a pulsing inner dot
+      if (r.kind === 'orb') {
+        const pulse = 0.5 + 0.5 * Math.sin(Game.time * 6);
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, 3 + pulse * 2, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        ctx.fill();
+      }
+    }
+  }
+
+  function renderReticle() {
+    const dir = Input.aimDir();
+    const cx = VIEW_W / 2, cy = VIEW_H / 2;
+    const mx = Input.mouse.x, my = Input.mouse.y;
+    ctx.save();
+
+    // Dashed aim-line from just in front of the player to just before the cursor.
+    ctx.strokeStyle = 'rgba(138,160,255,0.18)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 7]);
+    ctx.beginPath();
+    ctx.moveTo(cx + dir.x * 22, cy + dir.y * 22);
+    ctx.lineTo(mx - dir.x * 14, my - dir.y * 14);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Outer ring — softer glow halo
+    ctx.strokeStyle = 'rgba(138,160,255,0.25)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(mx, my, 11, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Inner crisp ring
+    ctx.strokeStyle = 'rgba(200,215,255,0.9)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(mx, my, 7, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Center dot
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.beginPath();
+    ctx.arc(mx, my, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Four small tick marks at N/S/E/W outside the ring
+    const TICK = 4, GAP = 10;
+    ctx.strokeStyle = 'rgba(200,215,255,0.75)';
+    ctx.lineWidth = 1.5;
+    for (const [dx, dy] of [[0,-1],[0,1],[1,0],[-1,0]]) {
+      ctx.beginPath();
+      ctx.moveTo(mx + dx * GAP, my + dy * GAP);
+      ctx.lineTo(mx + dx * (GAP + TICK), my + dy * (GAP + TICK));
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  function renderOrbMagnetRange() {
+    // Subtle dashed ring around player showing the magnet pull radius.
+    // Only drawn when there's at least one orb on screen.
+    let hasOrb = false;
+    for (const _id of ECS.query('SoulOrb')) { hasOrb = true; break; }
+    if (!hasOrb) return;
+    const cx = VIEW_W / 2, cy = VIEW_H / 2;
+    ctx.save();
+    ctx.setLineDash([4, 8]);
+    ctx.strokeStyle = 'rgba(150,190,255,0.18)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, cy, ORB_MAGNET_RADIUS, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function renderSystem() {
+    // Fill void colour before zoom so there's no bleed at edges.
+    ctx.fillStyle = '#0d0a1a';
+    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+
+    // Apply zoom centred on screen centre — all game-world rendering scales uniformly.
+    ctx.save();
+    ctx.translate(VIEW_W / 2, VIEW_H / 2);
+    ctx.scale(ZOOM, ZOOM);
+    ctx.translate(-VIEW_W / 2, -VIEW_H / 2);
+
+    drawBackground();
+    renderShockwaves();
+    renderVfxRings();
+    renderEntities();
+    renderParticles();
+    renderOrbMagnetRange();
+    renderReticle();
+
+    ctx.restore();
+  }
+
+  // --------------------------- HUD -------------------------------------- //
+  const hudKills  = document.getElementById('hud-kills');
+  const hudAbility= document.getElementById('hud-ability');
+  const hudTime   = document.getElementById('hud-time');
+  const hudHpFill = document.getElementById('hud-hp-fill');
+  const hudHpVal  = document.getElementById('hud-hp-val');
+
+  function updateHUD() {
+    hudKills.textContent   = String(Game.kills);
+    hudAbility.textContent = Game.currentAbilityName;
+    const m = Math.floor(Game.time / 60);
+    const s = Math.floor(Game.time % 60).toString().padStart(2, '0');
+    hudTime.textContent = `${m}:${s}`;
+
+    // Health bar — update width + color class.
+    const ph = ECS.get(Game.playerId, 'Health');
+    if (ph) {
+      const pct = Math.max(0, Math.min(1, ph.hp / ph.max));
+      hudHpFill.style.width = (pct * 100).toFixed(1) + '%';
+      hudHpFill.classList.toggle('warn', pct <= 0.4 && pct > 0.2);
+      hudHpFill.classList.toggle('crit', pct <= 0.2);
+      hudHpVal.textContent = Math.max(0, Math.ceil(ph.hp));
+    }
+  }
+
+  // --------------------------- Boot ------------------------------------- //
+  Game.playerId = createPlayer();
+  setAbility('basic_bolt');
+
+  // --------------------------- Game Loop -------------------------------- //
+  let last = performance.now();
+  const MAX_DT = 1 / 30;
+
+  function frame(now) {
+    const dt = Math.min((now - last) / 1000, MAX_DT);
+    last = now;
+
+    if (!Game.paused && !Game.gameOver) {
+      Game.time += dt;
+      playerMovementSystem(dt);
+      spawnSystem(dt);
+      enemyMoveSystem(dt);
+      slowedDecaySystem(dt);
+      orbMagnetSystem(dt);       // pull nearby orbs toward player
+      weaponSystem(dt);
+      enemyAbilitySystem(dt);
+      projectileSystem(dt);
+      shockwaveSystem(dt);
+      lifetimeSystem(dt);
+      collisionSystem(dt);
+    }
+    // VFX systems keep running even when paused (orb pickup flash should finish).
+    particleSystem(dt);
+    vfxRingSystem(dt);
+
+    ctx.clearRect(0, 0, VIEW_W, VIEW_H);
+    renderSystem();
+    updateHUD();
+
+    const ph = ECS.get(Game.playerId, 'Health');
+    if (ph && ph.hp <= 0 && !Game.gameOver) {
+      Game.gameOver = true;
+      GameAudio.stopFootsteps();
+    }
+    if (Game.gameOver) drawGameOver();
+
+    requestAnimationFrame(frame);
+  }
+
+  function drawGameOver() {
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.font = '600 42px ui-monospace, Menlo, Consolas, monospace';
+    ctx.fillText('YOU DIED', VIEW_W / 2, VIEW_H / 2 - 10);
+    ctx.font = '14px ui-monospace, Menlo, Consolas, monospace';
+    ctx.fillStyle = '#8a90a2';
+    ctx.fillText(`Kills: ${Game.kills}   ·   Time: ${hudTime.textContent}`, VIEW_W / 2, VIEW_H / 2 + 22);
+    ctx.fillText('Refresh to try again', VIEW_W / 2, VIEW_H / 2 + 44);
+    ctx.restore();
+  }
+
+  requestAnimationFrame(frame);
+
+  // Expose for debugging.
+  window.__GAME__ = { ECS, Game, EnemyArchetypes, PlayerWeapons, setAbility };
+})();
+</script>
+</body>
+</html>
