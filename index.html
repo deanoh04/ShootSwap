@@ -54,6 +54,161 @@
     padding: 6px 10px; border-radius: 6px;
     border: 1px solid #2a2f3d;
   }
+  /* ---- Shared overlay button ---- */
+  .screen-btn {
+    margin-top: 28px;
+    padding: 12px 36px;
+    font-family: inherit; font-size: 14px; font-weight: 700;
+    letter-spacing: 1px; color: #e6e6e6;
+    background: #1a2340; border: 1px solid #3a4a7a;
+    border-radius: 8px; cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .screen-btn:hover { background: #232f58; border-color: #8aa0ff; transform: translateY(-1px); }
+  .screen-btn:active { transform: translateY(0); }
+
+  /* ---- Main menu ---- */
+  #menu {
+    position: fixed; inset: 0; z-index: 40;
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at 50% 40%, #10152a 0%, #07090f 70%);
+  }
+  #menu.hidden { display: none; }
+  .menu-card { text-align: center; max-width: 480px; padding: 0 20px; }
+  .menu-title {
+    font-size: clamp(42px, 8vw, 68px); font-weight: 900;
+    letter-spacing: 6px; color: #fff;
+    text-shadow: 0 0 40px rgba(138,160,255,0.5), 0 0 80px rgba(138,160,255,0.2);
+    margin-bottom: 6px;
+  }
+  .menu-genre {
+    font-size: 13px; letter-spacing: 4px; color: #8aa0ff;
+    text-transform: uppercase; margin-bottom: 28px;
+  }
+  .menu-desc {
+    font-size: 14px; color: #9aa2b8; line-height: 1.7; margin-bottom: 24px;
+  }
+  .menu-controls {
+    display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+  .menu-controls span {
+    font-size: 11px; color: #bfe3ff; letter-spacing: 0.5px;
+    background: #1a2340; border: 1px solid #2a3a66;
+    padding: 4px 10px; border-radius: 5px;
+  }
+
+  /* ---- Game-over screen ---- */
+  #gameover {
+    position: fixed; inset: 0; z-index: 40;
+    display: none; align-items: center; justify-content: center;
+    background: rgba(5,7,12,0.88);
+    backdrop-filter: blur(6px);
+  }
+  #gameover.on { display: flex; }
+  .go-card {
+    text-align: center; max-width: 420px;
+    padding: 36px 40px; width: min(420px, 90vw);
+    background: #0f1320; border: 1px solid #2a2f3d;
+    border-radius: 14px; box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+  }
+  .go-title {
+    font-size: 44px; font-weight: 900; letter-spacing: 4px;
+    color: #f57c7c; margin: 0 0 6px 0;
+    text-shadow: 0 0 30px rgba(245,124,124,0.4);
+  }
+  .go-phase { font-size: 12px; color: #8a90a2; margin-bottom: 24px; letter-spacing: 1px; }
+  .go-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    margin-bottom: 16px;
+  }
+  .go-stat {
+    background: #080c18; border: 1px solid #1e2436;
+    border-radius: 8px; padding: 12px 8px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .go-label { font-size: 10px; color: #8a90a2; letter-spacing: 1px; text-transform: uppercase; }
+  .go-val   { font-size: 20px; font-weight: 700; color: #fff; }
+  .go-best  { font-size: 11px; color: #8aa0ff; min-height: 18px; margin-bottom: 4px; }
+
+  /* ---- Wave-clear upgrade picker ---- */
+  #upgrade {
+    position: fixed; inset: 0; z-index: 45;
+    display: none; align-items: center; justify-content: center;
+    background: rgba(5, 7, 14, 0.82);
+    backdrop-filter: blur(6px);
+  }
+  #upgrade.on { display: flex; }
+  .up-card {
+    text-align: center; width: min(780px, 94vw);
+    padding: 32px 36px;
+    background: #0f1320; border: 1px solid #2a2f3d;
+    border-radius: 16px;
+    box-shadow: 0 30px 90px rgba(0,0,0,0.75);
+  }
+  .up-eyebrow {
+    font-size: 11px; letter-spacing: 4px; color: #8aa0ff;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .up-title {
+    margin: 0 0 6px 0; font-size: 34px; font-weight: 900;
+    letter-spacing: 3px; color: #fff;
+    text-shadow: 0 0 30px rgba(138,160,255,0.35);
+  }
+  .up-subtitle {
+    font-size: 13px; color: #9aa2b8; margin-bottom: 22px;
+  }
+  .up-row {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  }
+  .up-opt {
+    padding: 18px 14px; text-align: left;
+    background: #0b0f1b; border: 1px solid #23304e;
+    border-radius: 12px; cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .up-opt:hover {
+    background: #141c34; border-color: #8aa0ff;
+    transform: translateY(-2px);
+  }
+  .up-opt .up-key {
+    align-self: flex-start;
+    font-size: 10px; color: #bfe3ff; letter-spacing: 1px;
+    background: #1a2340; border: 1px solid #2a3a66;
+    padding: 2px 7px; border-radius: 5px;
+  }
+  .up-opt .up-icon  { font-size: 28px; line-height: 1; color: #ffd28a; margin-top: 2px; }
+  .up-opt .up-name  { font-size: 15px; font-weight: 700; color: #fff; margin-top: 4px; }
+  .up-opt .up-tier {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffd28a;
+    background: rgba(255,210,138,0.12);
+    border: 1px solid rgba(255,210,138,0.35);
+    border-radius: 4px;
+    letter-spacing: 1px;
+    vertical-align: middle;
+  }
+  .up-opt .up-desc  { font-size: 12px; color: #9aa2b8; line-height: 1.5; }
+  .up-hint { font-size: 11px; color: #6b7390; margin-top: 16px; letter-spacing: 1px; }
+
+  /* Active-buff HUD badges (Fury / Overclock / Swift) */
+  #hud-buffs {
+    display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;
+  }
+  .buff-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 7px; border-radius: 10px;
+    border: 1px solid currentColor;
+    background: rgba(0,0,0,0.35);
+  }
+  .buff-badge .bb-time { opacity: 0.75; font-weight: 500; }
+
   /* Swap prompt */
   #swap {
     position: fixed; inset: 0;
@@ -97,10 +252,53 @@
 <canvas id="game"></canvas>
 
 
+<!-- Main menu (shown before game starts) -->
+<div id="menu">
+  <div class="menu-card">
+    <div class="menu-title">SOUL SWAP</div>
+    <div class="menu-genre">Bullet Heaven</div>
+    <div class="menu-desc">Survive endless waves of enemies. Collect Soul Orbs to steal their abilities and forge your own playstyle.</div>
+    <div class="menu-controls">
+      <span>WASD — Move</span>
+      <span>Mouse — Aim</span>
+      <span>Auto-fire</span>
+      <span>Orbs — Swap Ability</span>
+    </div>
+    <button class="screen-btn" id="btn-start">▶ &nbsp;Begin</button>
+  </div>
+</div>
+
+<!-- Wave-clear upgrade picker -->
+<div id="upgrade">
+  <div class="up-card">
+    <div class="up-eyebrow">Wave Cleared</div>
+    <h1 class="up-title" id="up-wave-name">Wave II — Stirring</h1>
+    <div class="up-subtitle">Choose a permanent upgrade for this run</div>
+    <div class="up-row" id="up-options"></div>
+    <div class="up-hint">Press 1 · 2 · 3 or click a card</div>
+  </div>
+</div>
+
+<!-- Death screen -->
+<div id="gameover">
+  <div class="go-card">
+    <h1 class="go-title">YOU DIED</h1>
+    <div class="go-phase" id="go-phase"></div>
+    <div class="go-stats">
+      <div class="go-stat"><span class="go-label">Survived</span><span class="go-val" id="go-time">0:00</span></div>
+      <div class="go-stat"><span class="go-label">Kills</span><span class="go-val" id="go-kills">0</span></div>
+      <div class="go-stat"><span class="go-label">Ability</span><span class="go-val" id="go-ability" style="font-size:13px;margin-top:3px">—</span></div>
+    </div>
+    <div class="go-best" id="go-best"></div>
+    <button class="screen-btn" id="btn-restart">↺ &nbsp;Play Again</button>
+  </div>
+</div>
+
 <div id="hud">
   <div><span class="k">Kills:</span> <span class="v" id="hud-kills">0</span></div>
   <div><span class="k">Ability:</span> <span class="v" id="hud-ability">Basic Bolt</span></div>
   <div><span class="k">Time:</span> <span class="v" id="hud-time">0:00</span></div>
+  <div><span class="k">Wave:</span> <span class="v" id="hud-phase">—</span></div>
   <div class="hp-row">
     <span class="k">HP</span>
     <div class="hp-track">
@@ -108,6 +306,7 @@
     </div>
     <span class="v" id="hud-hp-val">100</span>
   </div>
+  <div id="hud-buffs"></div>
 </div>
 <div id="hint">WASD / Arrows to move · Aim with mouse · Soul Orbs trigger Swap?</div>
 
@@ -264,9 +463,33 @@
   ].forEach(ECS.registerComponent.bind(ECS));
 
   // --------------------------- Camera ----------------------------------- //
-  const Camera = { x: 0, y: 0 };
+  // shakeMag decays exponentially each frame. Render uses current shake offset.
+  // Keep offsets on Camera so worldToScreen handles them transparently.
+  const Camera = { x: 0, y: 0, shakeMag: 0, shakeOffX: 0, shakeOffY: 0 };
   function worldToScreen(wx, wy) {
-    return { x: wx - Camera.x + VIEW_W / 2, y: wy - Camera.y + VIEW_H / 2 };
+    return {
+      x: wx - Camera.x + VIEW_W / 2 + Camera.shakeOffX,
+      y: wy - Camera.y + VIEW_H / 2 + Camera.shakeOffY,
+    };
+  }
+
+  // Called whenever the player takes a hit. Magnitude stacks up to a cap so
+  // repeated hits feel punchier without screen-shake going out of control.
+  function triggerShake(amount) {
+    Camera.shakeMag = Math.min(18, Camera.shakeMag + amount);
+  }
+  function updateShake(dt) {
+    if (Camera.shakeMag <= 0.05) {
+      Camera.shakeMag = 0;
+      Camera.shakeOffX = 0;
+      Camera.shakeOffY = 0;
+      return;
+    }
+    // Decay shakes to ~0 in ~0.45s. Re-randomize direction each frame for jitter.
+    Camera.shakeMag *= Math.pow(0.005, dt);
+    const a = Math.random() * Math.PI * 2;
+    Camera.shakeOffX = Math.cos(a) * Camera.shakeMag;
+    Camera.shakeOffY = Math.sin(a) * Camera.shakeMag;
   }
 
   // ----------------------- Particle Pool --------------------------------- //
@@ -390,6 +613,8 @@
     _shootIdx: 0,
     _fireballPool: [],
     _fireballIdx: 0,
+    _aoePool: [],
+    _aoeIdx: 0,
 
     // Called on first user gesture — creates all Audio objects then.
     init() {
@@ -417,6 +642,11 @@
         const a = new Audio('sounds/fireball.mp3');
         a.volume = 0.4;
         this._fireballPool.push(a);
+      }
+      for (let i = 0; i < 3; i++) {
+        const a = new Audio('sounds/AOE_blast.mp3');
+        a.volume = 0.5;
+        this._aoePool.push(a);
       }
     },
 
@@ -451,6 +681,12 @@
         this._death.currentTime = 0;
         this._death.volume = Math.min(1, volume);
         this._death.play().catch(() => {});
+      } else if (name === 'aoe') {
+        const snd = this._aoePool[this._aoeIdx % this._aoePool.length];
+        this._aoeIdx++;
+        snd.volume = Math.min(1, volume);
+        snd.currentTime = 0;
+        snd.play().catch(() => {});
       }
     },
   };
@@ -459,19 +695,35 @@
   const ORB_MAGNET_RADIUS = 160;  // world units — orbs start pulling toward player
   const ORB_MAX_SPEED     = 340;  // max pull speed when very close
 
+  function hpRegenSystem(dt) {
+    const rate = Game.upgrades.hpRegen;
+    if (rate <= 0) return;
+    const h = ECS.get(Game.playerId, 'Health');
+    if (!h || h.hp <= 0) return;
+    h.hp = Math.min(h.max, h.hp + rate * dt);
+  }
+
   function orbMagnetSystem(dt) {
     const pt = ECS.get(Game.playerId, 'Transform');
+    const radius = ORB_MAGNET_RADIUS * Game.upgrades.pickupRange;
+    // Magnet pulls Soul Orbs AND in-wave drops (Health Vials etc.).
+    const pull = (otX, otY, target) => {
+      const dx = pt.x - otX;
+      const dy = pt.y - otY;
+      const d = Math.hypot(dx, dy);
+      if (d > radius || d < 0.5) return;
+      const t = 1 - d / radius;                   // 0 at edge, 1 at center
+      const spd = 60 + t * t * (ORB_MAX_SPEED - 60);
+      target.x += (dx / d) * spd * dt;
+      target.y += (dy / d) * spd * dt;
+    };
     for (const oid of ECS.query('SoulOrb', 'Transform')) {
       const ot = ECS.get(oid, 'Transform');
-      const dx = pt.x - ot.x;
-      const dy = pt.y - ot.y;
-      const d = Math.hypot(dx, dy);
-      if (d > ORB_MAGNET_RADIUS || d < 0.5) continue;
-      // Quadratic pull: faster the closer it is.
-      const t = 1 - d / ORB_MAGNET_RADIUS;        // 0 at edge, 1 at center
-      const spd = 60 + t * t * (ORB_MAX_SPEED - 60);
-      ot.x += (dx / d) * spd * dt;
-      ot.y += (dy / d) * spd * dt;
+      pull(ot.x, ot.y, ot);
+    }
+    for (const oid of ECS.query('Drop', 'Transform')) {
+      const ot = ECS.get(oid, 'Transform');
+      pull(ot.x, ot.y, ot);
     }
   }
 
@@ -558,6 +810,16 @@
         cols: 3, rows: 3,
         totalFrames: 8,   // skip the blank 9th frame
       },
+      // One-shot attack animation played when the golem triggers its AoE pulse.
+      // Sheet: 640×64, 64×64 per frame, single row of 10 frames.
+      attackSheet: {
+        src: 'effects/golemn_attack.png',
+        frameW: 64, frameH: 64,
+        cols: 10, row: 0,
+        fps: 8,               // 10 frames / 8 fps = 1.25s — slow enough to actually read
+        drawSize: 200,        // much larger than idle (90) so the attack is unmistakable
+        glowColor: 'rgba(255,180,80,0.55)',
+      },
     },
   };
 
@@ -607,6 +869,137 @@
       };
       sheetImg.src = src;
     }
+
+    // Optional one-shot attack sheet (currently used by stone_golem).
+    if (data.attackSheet) {
+      const { src, frameW, frameH, cols, row, totalFrames } = data.attackSheet;
+      const sheetImg = new Image();
+      EnemySprites[type]['attack'] = [];
+      sheetImg.onload = () => {
+        const startRow  = row ?? 0;
+        const maxFrames = totalFrames ?? cols;
+        for (let c = 0; c < maxFrames; c++) {
+          const oc = document.createElement('canvas');
+          oc.width = frameW; oc.height = frameH;
+          oc.getContext('2d').drawImage(
+            sheetImg,
+            c * frameW, startRow * frameH, frameW, frameH,
+            0, 0, frameW, frameH
+          );
+          EnemySprites[type]['attack'].push(oc);
+        }
+        console.log(`[attack-sheet] loaded ${type}: ${EnemySprites[type]['attack'].length} frames`);
+      };
+      sheetImg.onerror = () => {
+        console.warn(`[attack-sheet] failed to load ${type} from ${src}`);
+      };
+      sheetImg.src = src;
+    }
+  }
+
+  // Map<entityId, startTime> for enemies currently mid-attack-animation.
+  const AttackAnims = new Map();
+
+  // Map<entityId, endTime> — an enemy flashes white until Game.time >= endTime.
+  // Refreshed (not stacked) on every hit so chained hits keep the flash bright.
+  const HitFlashes = new Map();
+  const HIT_FLASH_DURATION = 0.08; // seconds
+
+  // Floating damage numbers pool — world-space text that rises + fades out.
+  //   { x, y, vx, vy, text, color, size, t, life }
+  const FloatingText = [];
+  function spawnDamageNumber(x, y, amount, opts) {
+    const isCrit = !!(opts && opts.crit);
+    // Jitter start pos so overlapping hits don't stack vertically.
+    const jx = (Math.random() - 0.5) * 14;
+    FloatingText.push({
+      x: x + jx,
+      y: y - 4,
+      vx: (Math.random() - 0.5) * 18,  // slight sideways drift
+      vy: -58,                           // rises upward
+      text: isCrit ? Math.round(amount) + '!' : String(Math.round(amount)),
+      color: isCrit ? '#ffe27a' : '#ffffff',
+      size: isCrit ? 20 : 14,
+      t: 0,
+      life: isCrit ? 0.95 : 0.75,
+    });
+  }
+  function updateFloatingText(dt) {
+    for (let i = FloatingText.length - 1; i >= 0; i--) {
+      const f = FloatingText[i];
+      f.t += dt;
+      f.x += f.vx * dt;
+      f.y += f.vy * dt;
+      // Ease vy toward 0 (settles into a gentle float near the top of the arc).
+      f.vy += 72 * dt;    // small gravity pullback
+      if (f.vy > 0) f.vy *= Math.pow(0.2, dt);
+      if (f.t >= f.life) FloatingText.splice(i, 1);
+    }
+  }
+  function renderFloatingText() {
+    if (!FloatingText.length) return;
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (const f of FloatingText) {
+      const s = worldToScreen(f.x, f.y);
+      const t01 = f.t / f.life;
+      const alpha = t01 < 0.15 ? (t01 / 0.15) : (1 - (t01 - 0.15) / 0.85);
+      ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+      ctx.font = `bold ${f.size}px sans-serif`;
+      // Dark outline for legibility over any background color.
+      ctx.strokeStyle = 'rgba(10,6,18,0.9)';
+      ctx.lineWidth = 3;
+      ctx.strokeText(f.text, s.x, s.y);
+      ctx.fillStyle = f.color;
+      ctx.fillText(f.text, s.x, s.y);
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  // Called from everywhere we hit an enemy: flags hit-flash + spawns number.
+  function applyDamageFX(eid, worldX, worldY, amount, opts) {
+    HitFlashes.set(eid, Game.time + HIT_FLASH_DURATION);
+    spawnDamageNumber(worldX, worldY, amount, opts);
+  }
+
+  // Shared scratch canvas used to draw a white-tinted version of any sprite
+  // on the fly (for hit-flash). Sized generously to fit the largest enemy
+  // sprite. Reused across all flashes each frame — cheap.
+  const FLASH_CANVAS = document.createElement('canvas');
+  FLASH_CANVAS.width = 256;
+  FLASH_CANVAS.height = 256;
+  const FLASH_CTX = FLASH_CANVAS.getContext('2d');
+
+  // Paint a white-masked copy of `img` at (cx,cy) with given drawSize + alpha.
+  // Uses source-in composite so only the sprite's opaque pixels are painted,
+  // giving a clean silhouette flash over the original sprite.
+  function drawWhiteFlashOverlay(img, cx, cy, drawSize, alpha) {
+    if (!img) return;
+    FLASH_CTX.clearRect(0, 0, FLASH_CANVAS.width, FLASH_CANVAS.height);
+    FLASH_CTX.imageSmoothingEnabled = false;
+    FLASH_CTX.globalCompositeOperation = 'source-over';
+    FLASH_CTX.drawImage(img, 0, 0, drawSize, drawSize);
+    FLASH_CTX.globalCompositeOperation = 'source-in';
+    FLASH_CTX.fillStyle = '#ffffff';
+    FLASH_CTX.fillRect(0, 0, drawSize, drawSize);
+    const half = drawSize / 2;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(FLASH_CANVAS, 0, 0, drawSize, drawSize, cx - half, cy - half, drawSize, drawSize);
+    ctx.restore();
+  }
+
+  // Returns 0..1 flash intensity (1 at hit, fading to 0 over HIT_FLASH_DURATION).
+  // Cleans up expired entries.
+  function getFlashIntensity(eid) {
+    const endT = HitFlashes.get(eid);
+    if (endT == null) return 0;
+    const remain = endT - Game.time;
+    if (remain <= 0) { HitFlashes.delete(eid); return 0; }
+    return remain / HIT_FLASH_DURATION;
   }
 
   /**
@@ -649,6 +1042,67 @@
     img.src = `effects/fireball/FB${String(i).padStart(3, '0')}.png`;
   }
 
+  // -------------------- Fireball Impact (AoE) Frames --------------------- //
+  // 50 frames, 100×100 each: effects/fire_impact/frames/1_0.png … 1_49.png
+  // Played once at a fireball's splash point, scaled so the rendered diameter
+  // matches proj.splashRadius * 2 (preserving actual damage radius).
+  const IMPACT_FRAMES = [];
+  const IMPACT_FRAME_COUNT = 50;
+  const IMPACT_FPS = 45;   // whole anim plays in ~1.1s
+  for (let i = 0; i < IMPACT_FRAME_COUNT; i++) {
+    const img = new Image();
+    img.onload = (() => {
+      const idx = i;
+      return () => {
+        const oc = document.createElement('canvas');
+        oc.width  = img.naturalWidth;
+        oc.height = img.naturalHeight;
+        oc.getContext('2d').drawImage(img, 0, 0);
+        IMPACT_FRAMES[idx] = oc;
+      };
+    })();
+    img.src = `effects/fire_impact/frames/1_${i}.png`;
+  }
+
+  // Lightweight one-shot animated VFX pool (kept outside ECS for simplicity).
+  // Each entry: { x, y, t, life, frames, fps, drawSize }
+  const AnimVfx = [];
+
+  function spawnAnimVfx(x, y, frames, fps, drawSize, opts) {
+    // opts.pixelated: true for nearest-neighbor (keeps pixel-art crisp when
+    // upscaled). Defaults to false so stylized frames (fireball impact) render
+    // with smoothing, which looks better for non-pixel art.
+    AnimVfx.push({
+      x, y, t: 0,
+      life: frames.length / fps,
+      frames, fps, drawSize,
+      pixelated: !!(opts && opts.pixelated),
+    });
+  }
+
+  function animVfxSystem(dt) {
+    for (let i = AnimVfx.length - 1; i >= 0; i--) {
+      AnimVfx[i].t += dt;
+      if (AnimVfx[i].t >= AnimVfx[i].life) AnimVfx.splice(i, 1);
+    }
+  }
+
+  function renderAnimVfx() {
+    for (const v of AnimVfx) {
+      const s = worldToScreen(v.x, v.y);
+      const idx = Math.min(v.frames.length - 1, Math.floor(v.t * v.fps));
+      const f = v.frames[idx];
+      if (!f) continue;
+      const d = v.drawSize;
+      ctx.save();
+      ctx.imageSmoothingEnabled = !v.pixelated;
+      try {
+        ctx.drawImage(f, s.x - d / 2, s.y - d / 2, d, d);
+      } catch (_) {}
+      ctx.restore();
+    }
+  }
+
   // 8 direction keys in CCW order starting from East (atan2 sector 0).
   const DIR_KEYS = ['east','south-east','south','south-west','west','north-west','north','north-east'];
 
@@ -667,6 +1121,7 @@
 
   // --------------------------- Game State ------------------------------- //
   const Game = {
+    phase: 'menu',          // 'menu' | 'playing' | 'upgrade' | 'over'
     time: 0,
     kills: 0,
     playerId: null,
@@ -675,12 +1130,57 @@
     spawnTimer: 0,
     spawnInterval: 1.2,
     paused: false,
-    pendingSwap: null, // { orbId, sourceType }
-    gameOver: false,
-    playerDir: 'south',   // last known facing direction for sprite selection
-    animFrame: 0,         // current walk-cycle frame index (0–5)
-    animTimer: 0,         // time accumulator for frame stepping
+    godmode: false,         // dev flag: keeps player at full HP if true
+    pendingSwap: null,
+    playerDir: 'south',
+    animFrame: 0,
+    animTimer: 0,
+    // Wave + permanent-upgrade run state.
+    waveIdx: 1,              // player starts already in Wave I; triggers picker on II, III, ...
+    upgrades: {
+      maxHp:         0,        // additive flat bonus
+      damage:        1.0,      // multiplier
+      moveSpeed:     1.0,      // multiplier
+      fireRate:      1.0,      // multiplier (shorter cooldown)
+      hpRegen:       0.0,      // additive (HP per second)
+      pickupRange:   1.0,      // multiplier on orb magnet radius
+      projectileSize:1.0,      // multiplier on projectile + splash radius
+      pierce:        0,        // int: extra enemies a projectile can pass through
+      volley:        0,        // int: extra projectiles fired per aimed shot (spread)
+      critChance:    0.0,      // 0..1 chance to double damage on a shot
+      vampiric:      0.0,      // HP regained per enemy killed by player projectile
+      tiers:         {},       // key -> current tier level (1..MAX)
+    },
+    // Temporary buff timers from in-wave drops. Each entry:
+    //   { ttl: seconds remaining, mult: multiplier applied while active }
+    activeBuffs: {
+      damage:    { ttl: 0, mult: 1.0 },
+      fireRate:  { ttl: 0, mult: 1.0 },
+      moveSpeed: { ttl: 0, mult: 1.0 },
+    },
+    // Transient knockback velocity applied to the player (decays fast).
+    playerKnockback: { vx: 0, vy: 0 },
   };
+
+  // Default upgrade state, re-cloned on every resetGame.
+  const DEFAULT_UPGRADES = () => ({
+    maxHp: 0,
+    damage: 1.0, moveSpeed: 1.0, fireRate: 1.0,
+    hpRegen: 0.0, pickupRange: 1.0,
+    projectileSize: 1.0,
+    pierce: 0, volley: 0,
+    critChance: 0.0, vampiric: 0.0,
+    tiers: {},
+  });
+  // Default temp-buff state (all inactive, multipliers at 1.0).
+  const DEFAULT_BUFFS = () => ({
+    damage:    { ttl: 0, mult: 1.0 },
+    fireRate:  { ttl: 0, mult: 1.0 },
+    moveSpeed: { ttl: 0, mult: 1.0 },
+  });
+
+  // Session best — persists across runs without a page reload.
+  const SessionBest = { kills: 0, time: 0 };
 
   // --------------------------- Archetypes ------------------------------- //
   const EnemyArchetypes = {
@@ -807,9 +1307,12 @@
       strokeColor: arch.stroke,
       radius: arch.radius,
     });
-    ECS.add(id, 'Health', { hp: arch.hp, max: arch.hp });
+    const diff = getDiffPhase();
+    const hp = Math.round(arch.hp * diff.hpMult);
+    const speed = arch.speed * diff.speedMult;
+    ECS.add(id, 'Health', { hp, max: hp });
     ECS.add(id, 'EnemyTag', { type: typeKey, contactDps: arch.contactDps });
-    ECS.add(id, 'Mover', { speed: arch.speed });
+    ECS.add(id, 'Mover', { speed });
     ECS.add(id, 'Collider', { radius: arch.radius });
     ECS.add(id, 'EnemyAbility', {
       kind: arch.ability,
@@ -820,24 +1323,38 @@
     return id;
   }
 
+  // Returns an object describing the current difficulty phase.
+  function getDiffPhase() {
+    const t = Game.time;
+    if (t < 60)  return { idx: 1, name: 'I',   label: 'Awakening', hpMult: 1.0,  speedMult: 1.0  };
+    if (t < 140) return { idx: 2, name: 'II',  label: 'Stirring',  hpMult: 1.20, speedMult: 1.08 };
+    if (t < 230) return { idx: 3, name: 'III', label: 'Swarm',     hpMult: 1.50, speedMult: 1.15 };
+    if (t < 330) return { idx: 4, name: 'IV',  label: 'Siege',     hpMult: 1.85, speedMult: 1.28 };
+    return               { idx: 5, name: 'V',  label: 'Chaos',     hpMult: 2.30, speedMult: 1.40 };
+  }
+
   function spawnSystem(dt) {
     Game.spawnTimer -= dt;
-    Game.spawnInterval = Math.max(0.25, 1.3 - Game.time * 0.01);
-    if (Game.spawnTimer <= 0) {
-      Game.spawnTimer = Game.spawnInterval;
-      const roll = Math.random();
-      const t = Game.time;
-      let typeKey;
-      if (t < 15) {
-        typeKey = roll < 0.8 ? 'fire_bat' : 'frost_slime';
-      } else if (t < 45) {
-        typeKey = roll < 0.55 ? 'fire_bat' : roll < 0.9 ? 'frost_slime' : 'stone_golem';
-      } else {
-        typeKey = roll < 0.4 ? 'fire_bat' : roll < 0.75 ? 'frost_slime' : 'stone_golem';
-      }
-      const burst = (Math.random() < 0.15) ? 3 : 1;
-      for (let i = 0; i < burst; i++) spawnEnemy(typeKey);
-    }
+    const t = Game.time;
+    // Spawn interval: 1.5s → 0.45s, gentle decay so early waves breathe.
+    Game.spawnInterval = Math.max(0.45, 1.5 - t * 0.0055);
+    if (Game.spawnTimer > 0) return;
+    Game.spawnTimer = Game.spawnInterval;
+
+    const roll = Math.random();
+    let typeKey;
+    // 5-phase enemy mix, matched to stretched getDiffPhase boundaries.
+    if      (t < 60)  typeKey = 'fire_bat';
+    else if (t < 100) typeKey = roll < 0.7  ? 'fire_bat' : 'frost_slime';
+    else if (t < 170) typeKey = roll < 0.5  ? 'fire_bat' : roll < 0.85 ? 'frost_slime' : 'stone_golem';
+    else if (t < 260) typeKey = roll < 0.35 ? 'fire_bat' : roll < 0.72 ? 'frost_slime' : 'stone_golem';
+    else              typeKey = roll < 0.28 ? 'fire_bat' : roll < 0.58 ? 'frost_slime' : 'stone_golem';
+
+    // Bursts are rarer and smaller so each wave feels longer.
+    const burstChance = Math.min(0.28, 0.06 + t * 0.0008);
+    const maxBurst    = t > 260 ? 5 : t > 170 ? 4 : t > 90 ? 3 : 2;
+    const burst = Math.random() < burstChance ? 1 + Math.floor(Math.random() * maxBurst) : 1;
+    for (let i = 0; i < burst; i++) spawnEnemy(typeKey);
   }
 
   // --------------------------- Systems ---------------------------------- //
@@ -849,10 +1366,18 @@
     const t = ECS.get(id, 'Transform');
     const v = ECS.get(id, 'Velocity');
     const ax = Input.axis();
-    v.x = ax.x * PLAYER_SPEED;
-    v.y = ax.y * PLAYER_SPEED;
-    t.x += v.x * dt;
-    t.y += v.y * dt;
+    const moveMult = Game.upgrades.moveSpeed * (Game.activeBuffs.moveSpeed.ttl > 0 ? Game.activeBuffs.moveSpeed.mult : 1);
+    v.x = ax.x * PLAYER_SPEED * moveMult;
+    v.y = ax.y * PLAYER_SPEED * moveMult;
+    // Apply transient knockback on top of input, then decay it exponentially
+    // so it's big-but-brief (~0.2s to effectively zero).
+    const kb = Game.playerKnockback;
+    t.x += (v.x + kb.vx) * dt;
+    t.y += (v.y + kb.vy) * dt;
+    const decay = Math.pow(0.0005, dt);  // 1/2000 per second
+    kb.vx *= decay;
+    kb.vy *= decay;
+    if (Math.abs(kb.vx) < 1 && Math.abs(kb.vy) < 1) { kb.vx = 0; kb.vy = 0; }
     Camera.x = t.x;
     Camera.y = t.y;
     // Update facing direction, walk-cycle frame, and footstep audio.
@@ -908,7 +1433,10 @@
     const speed = variant === 'shard'
       ? def.shardSpeed : def.projectileSpeed;
     ECS.add(id, 'Velocity', { x: dirX * speed, y: dirY * speed });
-    const r = variant === 'shard' ? def.shardRadius : def.projRadius;
+    const baseR = variant === 'shard' ? def.shardRadius : def.projRadius;
+    // Bulk upgrade scales the rendered projectile AND its hitbox equally.
+    const sizeMult = Game.upgrades.projectileSize;
+    const r = baseR * sizeMult;
     ECS.add(id, 'Renderable', {
       kind: 'circle',
       color: variant === 'shard' ? def.shardColor : def.projColor,
@@ -916,13 +1444,22 @@
       radius: r,
       glow: def.mode === 'aimed' && def.splashRadius ? true : false,
     });
-    const dmg = variant === 'shard' ? def.shardDamage : def.damage;
+    const furyMult = Game.activeBuffs.damage.ttl > 0 ? Game.activeBuffs.damage.mult : 1;
+    const dmgMult = Game.upgrades.damage * furyMult;
+    // Crit roll at spawn — multiplies baked damage for the whole projectile life.
+    const critRoll = Math.random() < Game.upgrades.critChance;
+    const critMult = critRoll ? 2.0 : 1.0;
+    const dmg = (variant === 'shard' ? def.shardDamage : def.damage) * dmgMult * critMult;
+    const splashR = (def.splashRadius || 0) * sizeMult;
     ECS.add(id, 'Projectile', {
       damage: dmg,
       ownerTag: 'player',
       kind: variant || def.mode,           // 'bolt' | 'fireball' | 'shard'
-      splashRadius: def.splashRadius || 0,
-      splashDamage: def.splashDamage || 0,
+      splashRadius: splashR,
+      splashDamage: (def.splashDamage || 0) * dmgMult * critMult,
+      pierce: Game.upgrades.pierce,        // # extra enemies before despawn
+      hitIds: null,                        // lazy-init set once it starts piercing
+      crit: critRoll,
     });
     ECS.add(id, 'Collider', { radius: r });
     ECS.add(id, 'Lifetime', { ttl: 1.4 });
@@ -950,7 +1487,26 @@
     });
   }
 
+  // Fire an aimed shot plus any extra "volley" shots, each offset in a fan around
+  // the aim direction. All shots share the variant/audio — just different angles.
+  function fireVolley(fromX, fromY, dirX, dirY, def, variant) {
+    const extras = Game.upgrades.volley | 0;
+    const total = 1 + extras;
+    // Total fan width grows with more shots but caps so it doesn't look silly.
+    const fan = Math.min(0.85, 0.18 * extras);  // radians
+    const baseAngle = Math.atan2(dirY, dirX);
+    for (let i = 0; i < total; i++) {
+      // Spread evenly: for total==1 → just 0; for total==2 → -fan/2, +fan/2; etc.
+      const t01 = total === 1 ? 0.5 : i / (total - 1);
+      const offs = (t01 - 0.5) * fan;
+      const a = baseAngle + offs;
+      spawnPlayerProjectile(fromX, fromY, Math.cos(a), Math.sin(a), def, variant);
+    }
+  }
+
   function weaponSystem(dt) {
+    const powerGemMult = Game.activeBuffs.fireRate.ttl > 0 ? Game.activeBuffs.fireRate.mult : 1;
+    const frMult = Game.upgrades.fireRate * powerGemMult;
     for (const id of ECS.query('Weapon', 'Transform', 'PlayerTag')) {
       const w = ECS.get(id, 'Weapon');
       const t = ECS.get(id, 'Transform');
@@ -963,31 +1519,43 @@
         if (w.timer <= 0) {
           const dir = Input.aimDir();
           const isFire = w.kind === 'fireball';
-          spawnPlayerProjectile(t.x, t.y, dir.x, dir.y, def, isFire ? 'fireball' : 'bolt');
+          fireVolley(t.x, t.y, dir.x, dir.y, def, isFire ? 'fireball' : 'bolt');
           GameAudio.playOnce(isFire ? 'fireball' : 'shoot', 0.35);
-          w.timer = def.cooldown;
+          w.timer = def.cooldown / frMult;
         }
       } else if (def.mode === 'trail+shard') {
         if (w.timer <= 0) {
           // drop a frost blob only while moving
           const v = ECS.get(id, 'Velocity');
           if (v.x !== 0 || v.y !== 0) spawnFrostTrailBlob(t.x, t.y, def);
-          w.timer = def.cooldown;
+          w.timer = def.cooldown / frMult;
         }
         if (w.secondary) {
           w.secondary.timer -= dt;
           if (w.secondary.timer <= 0) {
             const dir = Input.aimDir();
-            spawnPlayerProjectile(t.x, t.y, dir.x, dir.y, def, 'shard');
+            fireVolley(t.x, t.y, dir.x, dir.y, def, 'shard');
             GameAudio.playOnce('shoot', 0.25);
-            w.secondary.timer = w.secondary.cooldown;
+            w.secondary.timer = w.secondary.cooldown / frMult;
           }
         }
       } else if (def.mode === 'pulse') {
         if (w.timer <= 0) {
-          spawnAoeShockwave(t.x, t.y, def, 'player');
-          GameAudio.playOnce('shoot', 0.35);
-          w.timer = def.cooldown;
+          const furyMult = Game.activeBuffs.damage.ttl > 0 ? Game.activeBuffs.damage.mult : 1;
+          spawnAoeShockwave(t.x, t.y, def, 'player', def.damage * Game.upgrades.damage * furyMult);
+          GameAudio.playOnce('aoe', 0.55);
+          // Play the exact same attack sprite animation the stone golem uses,
+          // scaled to roughly match the golem's ~3× upscale so pixel edges stay
+          // crisp. Passes `pixelated: true` so smoothing is disabled.
+          const gAttack = EnemySprites.stone_golem && EnemySprites.stone_golem.attack;
+          const gSheet  = EnemySpriteData.stone_golem.attackSheet;
+          if (gAttack && gAttack.length > 0 && gSheet) {
+            // 64×64 source → 224 px on screen = 3.5× upscale, close to the
+            // golem's own 200 px (3.125×) — readable but still sharp.
+            const drawSize = 224;
+            spawnAnimVfx(t.x, t.y, gAttack, gSheet.fps, drawSize, { pixelated: true });
+          }
+          w.timer = def.cooldown / frMult;
         }
       }
     }
@@ -1025,6 +1593,8 @@
             spawnAoeShockwave(t.x, t.y,
               { maxRadius: 150, growSpeed: 360, damage: 18, color: 'rgba(255,210,120,0.55)' },
               'enemy');
+            // Kick off the one-shot attack animation for this golem.
+            AttackAnims.set(id, Game.time);
             ab.timer = ab.cooldown;
           } else {
             ab.timer = 0.5;
@@ -1076,8 +1646,9 @@
           if (d <= sw.radius + ec.radius && d >= innerR - ec.radius) {
             const h = ECS.get(eid, 'Health');
             h.hp -= sw.damage;
+            applyDamageFX(eid, et.x, et.y - 8, sw.damage, {});
             sw.hitSet.add(eid);
-            if (h.hp <= 0) onEnemyKilled(eid);
+            if (h.hp <= 0) onEnemyKilled(eid, { killedByPlayer: true });
           }
         }
       } else {
@@ -1086,7 +1657,7 @@
           const dx = player.x - t.x, dy = player.y - t.y;
           const d = Math.hypot(dx, dy);
           if (d <= sw.radius + playerC.radius && d >= innerR - playerC.radius) {
-            playerH.hp -= sw.damage;
+            hurtPlayer(sw.damage, t.x, t.y, 260);
             sw.hitSet.add(Game.playerId);
           }
         }
@@ -1113,7 +1684,13 @@
   }
 
   // -------------------- Collisions --------------------------------------- //
-  function onEnemyKilled(eid) {
+  function onEnemyKilled(eid, opts) {
+    // opts.suppressRing: skip the expanding death ring (used when a bigger
+    //   VFX like the fireball impact animation is already covering this kill).
+    // opts.killedByPlayer: the player's weapon (not a DoT) killed this enemy —
+    //   used to gate vampiric lifesteal.
+    const suppressRing   = !!(opts && opts.suppressRing);
+    const killedByPlayer = !!(opts && opts.killedByPlayer);
     const tag = ECS.get(eid, 'EnemyTag');
     const et  = ECS.get(eid, 'Transform');
     const ren = ECS.get(eid, 'Renderable');
@@ -1123,19 +1700,38 @@
       const count = tag.type === 'stone_golem' ? 18 : tag.type === 'frost_slime' ? 13 : 10;
       spawnDeathParticles(et.x, et.y, arch ? arch.color : '#ffffff', count);
       GameAudio.playOnce('death', 0.5);
-      // Small VFX ring pop at death position.
-      spawnVfxRing(et.x, et.y, {
-        maxRadius: (ren ? ren.radius : 12) * 3.5,
-        growSpeed: 260,
-        color: arch ? arch.color : '#ffffff',
-        life: 0.35,
-        lineWidth: 2,
-      });
-      // 20% Soul Orb drop
-      if (Math.random() < 0.20) {
+      if (!suppressRing) {
+        // Small VFX ring pop at death position.
+        spawnVfxRing(et.x, et.y, {
+          maxRadius: (ren ? ren.radius : 12) * 3.5,
+          growSpeed: 260,
+          color: arch ? arch.color : '#ffffff',
+          life: 0.35,
+          lineWidth: 2,
+        });
+      }
+      // Drop roll: Soul Orb (20%) OR one of the 4 powerups (12% total = 3% each).
+      // Tuned so the player sees a powerup every ~8 kills on average — enough to
+      // feel generous without drowning the screen in pickups.
+      const roll = Math.random();
+      if (roll < 0.20) {
         spawnSoulOrb(et.x, et.y, tag.type);
+      } else if (roll < 0.23) {
+        spawnDrop(et.x, et.y, 'health_vial');
+      } else if (roll < 0.26) {
+        spawnDrop(et.x, et.y, 'fury_orb');
+      } else if (roll < 0.29) {
+        spawnDrop(et.x, et.y, 'power_gem');
+      } else if (roll < 0.32) {
+        spawnDrop(et.x, et.y, 'speed_orb');
       }
     }
+    // Vampiric: heal a flat amount per player-kill.
+    if (killedByPlayer && Game.upgrades.vampiric > 0) {
+      const h = ECS.get(Game.playerId, 'Health');
+      if (h && h.hp > 0) h.hp = Math.min(h.max, h.hp + Game.upgrades.vampiric);
+    }
+    AttackAnims.delete(eid);
     ECS.destroyEntity(eid);
     Game.kills++;
   }
@@ -1147,6 +1743,89 @@
     ECS.add(id, 'Collider', { radius: 12 });
     ECS.add(id, 'SoulOrb', { sourceType });
     ECS.add(id, 'Lifetime', { ttl: 15 }); // orbs linger but expire eventually
+  }
+
+  // ----------------------- In-wave power-up drops ------------------------ //
+  // Each entry describes how the pickup renders + what it does when absorbed.
+  //   color/ring: visuals (colored filled circle + outer glyph ring).
+  //   glyph: a 1-char label drawn inside the pickup.
+  //   apply(): runs when the player touches the drop (pauses nothing — fast).
+  //
+  // These are INSTANT OR TIMED BUFFS — no swap prompt like Soul Orbs.
+  const DROP_DEFS = {
+    health_vial: {
+      name: 'Health Vial',
+      color: '#ff5d5d', ring: '#ffd8d8', glyph: '+',
+      apply() {
+        const h = ECS.get(Game.playerId, 'Health');
+        if (h) h.hp = Math.min(h.max, h.hp + 25);
+      },
+    },
+    fury_orb: {
+      name: 'Fury',
+      color: '#ff9230', ring: '#ffd8a8', glyph: '⚔',
+      apply() {
+        Game.activeBuffs.damage.ttl = 10;
+        Game.activeBuffs.damage.mult = 1.5;
+      },
+    },
+    power_gem: {
+      name: 'Overclock',
+      color: '#6fd2ff', ring: '#ccf3ff', glyph: '⚡',
+      apply() {
+        Game.activeBuffs.fireRate.ttl = 10;
+        Game.activeBuffs.fireRate.mult = 1.5;
+      },
+    },
+    speed_orb: {
+      name: 'Swift',
+      color: '#7bff8e', ring: '#d6ffdc', glyph: '◈',
+      apply() {
+        Game.activeBuffs.moveSpeed.ttl = 10;
+        Game.activeBuffs.moveSpeed.mult = 1.3;
+      },
+    },
+  };
+
+  function spawnDrop(x, y, kind) {
+    const d = DROP_DEFS[kind];
+    if (!d) return;
+    const id = ECS.createEntity();
+    ECS.add(id, 'Transform', { x, y });
+    ECS.add(id, 'Renderable', { kind: 'drop', color: d.color, ring: d.ring, glyph: d.glyph, radius: 11 });
+    ECS.add(id, 'Collider', { radius: 14 });
+    ECS.add(id, 'Drop', { kind });
+    ECS.add(id, 'Lifetime', { ttl: 18 });
+  }
+
+  // Tick down the temporary buff timers once per frame.
+  function buffTimerSystem(dt) {
+    const b = Game.activeBuffs;
+    if (b.damage.ttl    > 0) { b.damage.ttl    -= dt; if (b.damage.ttl    <= 0) { b.damage.ttl = 0;    b.damage.mult    = 1.0; } }
+    if (b.fireRate.ttl  > 0) { b.fireRate.ttl  -= dt; if (b.fireRate.ttl  <= 0) { b.fireRate.ttl = 0;  b.fireRate.mult  = 1.0; } }
+    if (b.moveSpeed.ttl > 0) { b.moveSpeed.ttl -= dt; if (b.moveSpeed.ttl <= 0) { b.moveSpeed.ttl = 0; b.moveSpeed.mult = 1.0; } }
+  }
+
+  // Centralized player-hurt: applies damage, screen shake, knockback, and spark.
+  // `srcX/srcY` is where the damage came from (used to push the player away).
+  // `impulse` controls how strongly the player is knocked; 0 = no knockback.
+  function hurtPlayer(amount, srcX, srcY, impulse) {
+    const playerT = ECS.get(Game.playerId, 'Transform');
+    const playerH = ECS.get(Game.playerId, 'Health');
+    if (!playerH || playerH.hp <= 0) return;
+    playerH.hp -= amount;
+    // Shake scales with damage taken (bigger hits = punchier shake).
+    triggerShake(3 + Math.min(10, amount * 0.35));
+    // Knockback: push away from source if provided.
+    if (impulse > 0 && playerT) {
+      const dx = playerT.x - srcX;
+      const dy = playerT.y - srcY;
+      const d = Math.hypot(dx, dy) || 1;
+      const kb = Game.playerKnockback;
+      // Additive so multiple simultaneous hits compound slightly.
+      kb.vx += (dx / d) * impulse;
+      kb.vy += (dy / d) * impulse;
+    }
   }
 
   function collisionSystem(dt) {
@@ -1162,6 +1841,8 @@
       const pc = ECS.get(pid, 'Collider');
       let hitEid = -1;
       for (const eid of ECS.query('EnemyTag', 'Transform', 'Collider', 'Health')) {
+        // Skip enemies this pierced projectile has already hit.
+        if (proj.hitIds && proj.hitIds.has(eid)) continue;
         const et = ECS.get(eid, 'Transform');
         const ec = ECS.get(eid, 'Collider');
         const r = pc.radius + ec.radius;
@@ -1170,19 +1851,20 @@
       }
       if (hitEid !== -1) {
         const h = ECS.get(hitEid, 'Health');
+        const hitT = ECS.get(hitEid, 'Transform');
         h.hp -= proj.damage;
-        // Hit spark at impact point, colored by projectile.
+        // Hit-flash + floating damage number on the primary target.
+        applyDamageFX(hitEid, hitT.x, hitT.y - 8, proj.damage, { crit: proj.crit });
         const pr = ECS.get(pid, 'Renderable');
-        spawnHitSpark(pt.x, pt.y, pr ? pr.color : '#ffffff');
-        // Fireball splash + extra VFX ring.
+        // Splash projectiles get the animated impact only — skip the small spark
+        // burst so the two effects don't double up.
         if (proj.splashRadius > 0) {
-          spawnVfxRing(pt.x, pt.y, {
-            maxRadius: proj.splashRadius * 1.1,
-            growSpeed: 380,
-            color: '#ff9a5a',
-            life: 0.25,
-            lineWidth: 3,
-          });
+          // Visual size is ~7× the damage radius so the explosion reads big and
+          // punchy. Damage hitbox below remains exactly proj.splashRadius.
+          const visualDiameter = proj.splashRadius * 7;
+          spawnAnimVfx(pt.x, pt.y, IMPACT_FRAMES, IMPACT_FPS, visualDiameter);
+          // Small shake on splash so players FEEL the boom even at range.
+          triggerShake(4);
           for (const eid of ECS.query('EnemyTag', 'Transform', 'Health')) {
             if (eid === hitEid) continue;
             const et = ECS.get(eid, 'Transform');
@@ -1190,12 +1872,25 @@
             if (dx*dx + dy*dy <= proj.splashRadius * proj.splashRadius) {
               const eh = ECS.get(eid, 'Health');
               eh.hp -= proj.splashDamage;
-              if (eh.hp <= 0) onEnemyKilled(eid);
+              applyDamageFX(eid, et.x, et.y - 8, proj.splashDamage, { crit: proj.crit });
+              if (eh.hp <= 0) onEnemyKilled(eid, { suppressRing: true, killedByPlayer: true });
             }
           }
+        } else {
+          // Non-splash projectiles still get the small spark for hit feedback.
+          // Crit hits get a brighter, wider spark so they read clearly.
+          spawnHitSpark(pt.x, pt.y, proj.crit ? '#ffe27a' : (pr ? pr.color : '#ffffff'));
         }
-        ECS.destroyEntity(pid);
-        if (h.hp <= 0) onEnemyKilled(hitEid);
+        // Pierce: projectile survives a hit if it still has pierce left, and
+        // remembers which enemies it's already hit so it can't double-strike.
+        if (proj.pierce > 0) {
+          proj.pierce -= 1;
+          if (!proj.hitIds) proj.hitIds = new Set();
+          proj.hitIds.add(hitEid);
+        } else {
+          ECS.destroyEntity(pid);
+        }
+        if (h.hp <= 0) onEnemyKilled(hitEid, { suppressRing: proj.splashRadius > 0, killedByPlayer: true });
       }
     }
 
@@ -1208,14 +1903,16 @@
       const r = pc.radius + playerC.radius;
       const dx = pt.x - playerT.x, dy = pt.y - playerT.y;
       if (dx*dx + dy*dy <= r*r) {
-        playerH.hp -= proj.damage;
+        hurtPlayer(proj.damage, pt.x, pt.y, 220);
         // Red-tinted sparks on player hit.
         spawnHitSpark(playerT.x, playerT.y, '#ff6060');
         ECS.destroyEntity(pid);
       }
     }
 
-    // Enemy body contact damage
+    // Enemy body contact damage — steady DoT while touching, plus a tiny
+    // knockback pulse to keep the player from getting glued to a wall of
+    // enemies.  Shake is scaled down since this fires every frame on contact.
     for (const eid of ECS.query('EnemyTag', 'Transform', 'Collider')) {
       const et = ECS.get(eid, 'Transform');
       const ec = ECS.get(eid, 'Collider');
@@ -1223,7 +1920,14 @@
       const dx = playerT.x - et.x, dy = playerT.y - et.y;
       if (dx*dx + dy*dy <= r*r) {
         const tag = ECS.get(eid, 'EnemyTag');
-        playerH.hp -= (tag.contactDps || 10) * dt;
+        const dmg = (tag.contactDps || 10) * dt;
+        // Don't spam triggerShake every frame — cap to a gentle trickle.
+        if (playerH && playerH.hp > 0) playerH.hp -= dmg;
+        // Gentle push per frame; additive with exp decay, caps naturally.
+        const kb = Game.playerKnockback;
+        const d = Math.hypot(dx, dy) || 1;
+        kb.vx += (dx / d) * 40 * dt;
+        kb.vy += (dy / d) * 40 * dt;
       }
     }
 
@@ -1244,11 +1948,12 @@
           }
         }
       }
-      // Player standing in enemy frost -> small damage over time
+      // Player standing in enemy frost -> small damage over time.
+      // No shake/knockback — it's a DoT, not an impact.
       if (sf.damagesPlayer) {
         const dx = playerT.x - ft.x, dy = playerT.y - ft.y;
         if (dx*dx + dy*dy <= sf.radius * sf.radius) {
-          playerH.hp -= 6 * dt;
+          if (playerH && playerH.hp > 0) playerH.hp -= 6 * dt;
         }
       }
     }
@@ -1263,6 +1968,29 @@
         const orb = ECS.get(oid, 'SoulOrb');
         openSwapPrompt(oid, orb.sourceType);
         break; // one at a time
+      }
+    }
+
+    // In-wave drop pickup -> instant apply (no pause).
+    for (const did of ECS.query('Drop', 'Transform', 'Collider')) {
+      const ot = ECS.get(did, 'Transform');
+      const oc = ECS.get(did, 'Collider');
+      const r = oc.radius + playerC.radius;
+      const dx = playerT.x - ot.x, dy = playerT.y - ot.y;
+      if (dx*dx + dy*dy <= r*r) {
+        const d = ECS.get(did, 'Drop');
+        const def = DROP_DEFS[d.kind];
+        if (def) {
+          def.apply();
+          // Little feedback pop using the drop's ring color, plus a tiny
+          // particle burst so pickup feels crunchy.
+          spawnVfxRing(ot.x, ot.y, {
+            maxRadius: 38, growSpeed: 240,
+            color: def.ring, life: 0.32, lineWidth: 3,
+          });
+          spawnDeathParticles(ot.x, ot.y, def.color, 8);
+        }
+        ECS.destroyEntity(did);
       }
     }
   }
@@ -1337,9 +2065,10 @@
         const tx = camTileX + dx;
         const ty = camTileY + dy;
 
-        // Screen position of this tile's top-left corner.
-        const sx = (tx * TILE_DRAW) - (Camera.x - VIEW_W / 2);
-        const sy = (ty * TILE_DRAW) - (Camera.y - VIEW_H / 2);
+        // Screen position of this tile's top-left corner (shake offset
+        // included so the ground moves with the rest of the world).
+        const sx = (tx * TILE_DRAW) - (Camera.x - VIEW_W / 2) + Camera.shakeOffX;
+        const sy = (ty * TILE_DRAW) - (Camera.y - VIEW_H / 2) + Camera.shakeOffY;
 
         const [srcX, srcY] = FLOOR_TILES[tileVariant(tx, ty)];
         ctx.drawImage(
@@ -1426,14 +2155,69 @@
       // ---- Enemies with sprites ----
       if (ECS.has(id, 'EnemyTag')) {
         const tag = ECS.get(id, 'EnemyTag');
-        const img = getEnemySpriteFrame(tag.type);
+        const data = EnemySpriteData[tag.type];
+
+        // If an attack animation is active for this entity, draw a pulsing glow
+        // underneath (always) and swap in the attack frame (when sheet is loaded).
+        let attackFrame  = null;
+        let attackDraw   = 0;
+        let attackT01    = 0;   // 0..1 progress through the attack animation
+        let attackActive = false;
+        const startT = AttackAnims.get(id);
+        if (startT != null && data && data.attackSheet) {
+          const total = ((EnemySprites[tag.type]['attack'] &&
+                          EnemySprites[tag.type]['attack'].length) ||
+                         (data.attackSheet.totalFrames ?? data.attackSheet.cols))
+                        / data.attackSheet.fps;
+          const elapsed = Game.time - startT;
+          if (elapsed >= total) {
+            AttackAnims.delete(id);              // animation done — clear flag
+          } else {
+            attackActive = true;
+            attackT01    = elapsed / total;
+            const atkFrames = EnemySprites[tag.type]['attack'];
+            if (atkFrames && atkFrames.length > 0) {
+              const idx = Math.min(atkFrames.length - 1,
+                                   Math.floor(elapsed * data.attackSheet.fps));
+              attackFrame = atkFrames[idx];
+              attackDraw  = data.attackSheet.drawSize || data.drawSize;
+            }
+          }
+        }
+
+        // Pulsing warm glow under any golem that is mid-attack. Drawn BEFORE the
+        // sprite so it appears as a halo, and it renders even if the sprite
+        // sheet failed to load, so the attack is always visually indicated.
+        if (attackActive) {
+          const glowColor = (data.attackSheet && data.attackSheet.glowColor) || 'rgba(255,180,80,0.55)';
+          const baseSize = attackDraw || data.drawSize;
+          // fade in over first 20%, hold, fade out over final 30%
+          const alpha = attackT01 < 0.2 ? (attackT01 / 0.2) :
+                        attackT01 > 0.7 ? ((1 - attackT01) / 0.3) : 1;
+          const glowR = baseSize * 0.6 * (0.75 + 0.25 * Math.sin((Game.time - startT) * 18));
+          ctx.save();
+          const grd = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, glowR);
+          grd.addColorStop(0, glowColor);
+          grd.addColorStop(1, 'rgba(255,180,80,0)');
+          ctx.globalAlpha = alpha;
+          ctx.fillStyle = grd;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, glowR, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        const img = attackFrame || getEnemySpriteFrame(tag.type);
         if (img) {
-          const drawSize = EnemySpriteData[tag.type].drawSize;
+          const drawSize = attackFrame ? attackDraw : data.drawSize;
           const half = drawSize / 2;
           ctx.save();
           ctx.imageSmoothingEnabled = false;
           ctx.drawImage(img, s.x - half, s.y - half, drawSize, drawSize);
           ctx.restore();
+          // Hit-flash overlay — white-tinted silhouette on top of the sprite.
+          const flash = getFlashIntensity(id);
+          if (flash > 0) drawWhiteFlashOverlay(img, s.x, s.y, drawSize, 0.85 * flash);
           continue; // skip generic circle
         }
         // No sprite available — fall through to generic circle below.
@@ -1469,7 +2253,14 @@
       }
       ctx.beginPath();
       ctx.arc(s.x, s.y, r.radius, 0, Math.PI * 2);
-      ctx.fillStyle = r.color;
+      // Fallback hit-flash for circle-rendered enemies: swap fill to white
+      // during the flash window, scaled by intensity.
+      const flash = ECS.has(id, 'EnemyTag') ? getFlashIntensity(id) : 0;
+      if (flash > 0) {
+        ctx.fillStyle = `rgba(255,255,255,${(0.35 + 0.65 * flash).toFixed(3)})`;
+      } else {
+        ctx.fillStyle = r.color;
+      }
       ctx.fill();
       if (r.strokeColor) {
         ctx.lineWidth = 2;
@@ -1485,6 +2276,24 @@
         ctx.arc(s.x, s.y, 3 + pulse * 2, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(255,255,255,0.9)';
         ctx.fill();
+      }
+
+      // In-wave drops (Health Vial, Fury Orb, etc.) — pulsing outer ring + glyph.
+      if (r.kind === 'drop') {
+        const pulse = 0.5 + 0.5 * Math.sin(Game.time * 5);
+        ctx.save();
+        ctx.strokeStyle = r.ring;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, r.radius + 3 + pulse * 2, 0, Math.PI * 2);
+        ctx.stroke();
+        // Glyph label centered in the drop.
+        ctx.fillStyle = 'rgba(20,12,24,0.9)';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(r.glyph || '?', s.x, s.y + 1);
+        ctx.restore();
       }
     }
   }
@@ -1551,7 +2360,7 @@
     ctx.strokeStyle = 'rgba(150,190,255,0.18)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.arc(cx, cy, ORB_MAGNET_RADIUS, 0, Math.PI * 2);
+    ctx.arc(cx, cy, ORB_MAGNET_RADIUS * Game.upgrades.pickupRange, 0, Math.PI * 2);
     ctx.stroke();
     ctx.restore();
   }
@@ -1572,6 +2381,8 @@
     renderVfxRings();
     renderEntities();
     renderParticles();
+    renderAnimVfx();          // frame-based one-shot VFX (fireball impact, etc.)
+    renderFloatingText();     // damage numbers above enemies
     renderOrbMagnetRange();
     renderReticle();
 
@@ -1582,17 +2393,32 @@
   const hudKills  = document.getElementById('hud-kills');
   const hudAbility= document.getElementById('hud-ability');
   const hudTime   = document.getElementById('hud-time');
+  const hudPhase  = document.getElementById('hud-phase');
   const hudHpFill = document.getElementById('hud-hp-fill');
   const hudHpVal  = document.getElementById('hud-hp-val');
+  const hudBuffs  = document.getElementById('hud-buffs');
+
+  // Visual config for each buff type (used by the HUD badge renderer).
+  const BUFF_VIS = {
+    damage:    { label: 'Fury',      color: '#ff9230', glyph: '⚔' },
+    fireRate:  { label: 'Overclock', color: '#6fd2ff', glyph: '⚡' },
+    moveSpeed: { label: 'Swift',     color: '#7bff8e', glyph: '◈' },
+  };
+
+  function fmtTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
 
   function updateHUD() {
+    if (Game.phase !== 'playing') return;
     hudKills.textContent   = String(Game.kills);
     hudAbility.textContent = Game.currentAbilityName;
-    const m = Math.floor(Game.time / 60);
-    const s = Math.floor(Game.time % 60).toString().padStart(2, '0');
-    hudTime.textContent = `${m}:${s}`;
+    hudTime.textContent    = fmtTime(Game.time);
+    const dp = getDiffPhase();
+    hudPhase.textContent   = `${dp.name} — ${dp.label}`;
 
-    // Health bar — update width + color class.
     const ph = ECS.get(Game.playerId, 'Health');
     if (ph) {
       const pct = Math.max(0, Math.min(1, ph.hp / ph.max));
@@ -1601,11 +2427,276 @@
       hudHpFill.classList.toggle('crit', pct <= 0.2);
       hudHpVal.textContent = Math.max(0, Math.ceil(ph.hp));
     }
+
+    // Active buff badges — rebuild each frame (small set, cheap enough).
+    if (hudBuffs) {
+      const b = Game.activeBuffs;
+      let html = '';
+      for (const k of ['damage', 'fireRate', 'moveSpeed']) {
+        const buff = b[k];
+        if (!buff || buff.ttl <= 0) continue;
+        const vis = BUFF_VIS[k];
+        const secs = Math.ceil(buff.ttl);
+        html += `<span class="buff-badge" style="color:${vis.color}">${vis.glyph} ${vis.label} <span class="bb-time">${secs}s</span></span>`;
+      }
+      hudBuffs.innerHTML = html;
+    }
   }
+
+  // --------------------------- Run lifecycle ----------------------------- //
+  const menuEl    = document.getElementById('menu');
+  const gameoverEl= document.getElementById('gameover');
+  const upgradeEl = document.getElementById('upgrade');
+  const upWaveEl  = document.getElementById('up-wave-name');
+  const upOptsEl  = document.getElementById('up-options');
+  const goTimeEl  = document.getElementById('go-time');
+  const goKillsEl = document.getElementById('go-kills');
+  const goAbilityEl = document.getElementById('go-ability');
+  const goPhaseEl = document.getElementById('go-phase');
+  const goBestEl  = document.getElementById('go-best');
+
+  // --- Permanent upgrade pool (tiered) --------------------------------- //
+  // Each entry has 3 tiers. Tier shown on card = current tier + 1 (the next
+  // level the player would unlock). `apply` runs when the tier is chosen.
+  // Upgrades are hidden from the picker once the player has picked tier 3.
+  const ROMAN = ['', 'I', 'II', 'III'];
+
+  function healPlayer(amount) {
+    const h = ECS.get(Game.playerId, 'Health');
+    if (h) h.hp = Math.min(h.max, h.hp + amount);
+  }
+  function bumpMaxHp(amount) {
+    const h = ECS.get(Game.playerId, 'Health');
+    if (h) { h.max += amount; h.hp = Math.min(h.max, h.hp + amount); }
+    Game.upgrades.maxHp += amount;
+  }
+
+  const UpgradePool = [
+    { key: 'vigor', icon: '♥', title: 'Vigor', tiers: [
+      { desc: '+25 Max HP (heal 25)', apply: () => bumpMaxHp(25) },
+      { desc: '+40 Max HP (heal 40)', apply: () => bumpMaxHp(40) },
+      { desc: '+60 Max HP (heal 60)', apply: () => bumpMaxHp(60) },
+    ]},
+    { key: 'power', icon: '⚔', title: 'Power', tiers: [
+      { desc: '+15% Damage', apply: () => { Game.upgrades.damage *= 1.15; } },
+      { desc: '+20% Damage', apply: () => { Game.upgrades.damage *= 1.20; } },
+      { desc: '+25% Damage', apply: () => { Game.upgrades.damage *= 1.25; } },
+    ]},
+    { key: 'haste', icon: '◈', title: 'Haste', tiers: [
+      { desc: '+10% Move Speed', apply: () => { Game.upgrades.moveSpeed *= 1.10; } },
+      { desc: '+12% Move Speed', apply: () => { Game.upgrades.moveSpeed *= 1.12; } },
+      { desc: '+15% Move Speed', apply: () => { Game.upgrades.moveSpeed *= 1.15; } },
+    ]},
+    { key: 'rapid', icon: '⚡', title: 'Rapid Fire', tiers: [
+      { desc: '+12% Fire Rate', apply: () => { Game.upgrades.fireRate *= 1.12; } },
+      { desc: '+15% Fire Rate', apply: () => { Game.upgrades.fireRate *= 1.15; } },
+      { desc: '+20% Fire Rate', apply: () => { Game.upgrades.fireRate *= 1.20; } },
+    ]},
+    { key: 'regen', icon: '✚', title: 'Regen', tiers: [
+      { desc: '+0.5 HP / sec',  apply: () => { Game.upgrades.hpRegen += 0.5;  } },
+      { desc: '+0.75 HP / sec', apply: () => { Game.upgrades.hpRegen += 0.75; } },
+      { desc: '+1.0 HP / sec',  apply: () => { Game.upgrades.hpRegen += 1.0;  } },
+    ]},
+    { key: 'magnet', icon: '◎', title: 'Magnet', tiers: [
+      { desc: '+30% Pickup Range', apply: () => { Game.upgrades.pickupRange *= 1.30; } },
+      { desc: '+40% Pickup Range', apply: () => { Game.upgrades.pickupRange *= 1.40; } },
+      { desc: '+50% Pickup Range', apply: () => { Game.upgrades.pickupRange *= 1.50; } },
+    ]},
+    // -- New tiered upgrades --
+    { key: 'bulk', icon: '●', title: 'Bulk Shot', tiers: [
+      { desc: '+25% Projectile Size', apply: () => { Game.upgrades.projectileSize *= 1.25; } },
+      { desc: '+30% Projectile Size', apply: () => { Game.upgrades.projectileSize *= 1.30; } },
+      { desc: '+40% Projectile Size', apply: () => { Game.upgrades.projectileSize *= 1.40; } },
+    ]},
+    { key: 'pierce', icon: '⟶', title: 'Pierce', tiers: [
+      { desc: 'Shots pierce +1 enemy', apply: () => { Game.upgrades.pierce += 1; } },
+      { desc: 'Shots pierce +1 enemy', apply: () => { Game.upgrades.pierce += 1; } },
+      { desc: 'Shots pierce +1 enemy', apply: () => { Game.upgrades.pierce += 1; } },
+    ]},
+    { key: 'volley', icon: '※', title: 'Volley', tiers: [
+      { desc: '+1 projectile per shot', apply: () => { Game.upgrades.volley += 1; } },
+      { desc: '+1 projectile per shot', apply: () => { Game.upgrades.volley += 1; } },
+      { desc: '+1 projectile per shot', apply: () => { Game.upgrades.volley += 1; } },
+    ]},
+    { key: 'crit', icon: '✦', title: 'Critical', tiers: [
+      { desc: '+15% Crit Chance (2× dmg)', apply: () => { Game.upgrades.critChance = Math.min(1, Game.upgrades.critChance + 0.15); } },
+      { desc: '+15% Crit Chance',          apply: () => { Game.upgrades.critChance = Math.min(1, Game.upgrades.critChance + 0.15); } },
+      { desc: '+15% Crit Chance',          apply: () => { Game.upgrades.critChance = Math.min(1, Game.upgrades.critChance + 0.15); } },
+    ]},
+    { key: 'vampiric', icon: '♠', title: 'Vampiric', tiers: [
+      { desc: '+1.5 HP per kill', apply: () => { Game.upgrades.vampiric += 1.5; } },
+      { desc: '+2.0 HP per kill', apply: () => { Game.upgrades.vampiric += 2.0; } },
+      { desc: '+2.5 HP per kill', apply: () => { Game.upgrades.vampiric += 2.5; } },
+    ]},
+  ];
+
+  // Current tier the player has ALREADY picked (0..3). Next pick applies tier+1.
+  function currentTier(key) { return Game.upgrades.tiers[key] || 0; }
+
+  function applyUpgrade(key) {
+    const entry = UpgradePool.find(u => u.key === key);
+    if (!entry) return;
+    const tier = currentTier(key);
+    if (tier >= entry.tiers.length) return;   // maxed — no-op
+    entry.tiers[tier].apply();
+    Game.upgrades.tiers[key] = tier + 1;
+  }
+
+  // Random sample of 3 upgrades, filtered to those the player can still level up.
+  // Falls back to whatever's available if fewer than 3 remain.
+  function pickThreeUpgrades() {
+    const pool = UpgradePool.filter(u => currentTier(u.key) < u.tiers.length);
+    const out = [];
+    const working = pool.slice();
+    while (out.length < 3 && working.length) {
+      const i = Math.floor(Math.random() * working.length);
+      out.push(working.splice(i, 1)[0]);
+    }
+    return out;
+  }
+
+  let currentChoices = [];
+  function showUpgradePicker(phase) {
+    Game.phase = 'upgrade';
+    GameAudio.stopFootsteps();
+    upWaveEl.textContent = `Wave ${phase.name} — ${phase.label}`;
+    currentChoices = pickThreeUpgrades();
+    upOptsEl.innerHTML = '';
+    currentChoices.forEach((u, i) => {
+      const tier = currentTier(u.key);              // 0..2 before this pick
+      const nextTierLabel = ROMAN[tier + 1];        // I / II / III
+      const nextTierDesc  = u.tiers[tier].desc;
+      const el = document.createElement('button');
+      el.className = 'up-opt';
+      el.innerHTML = `
+        <span class="up-key">${i + 1}</span>
+        <div class="up-icon">${u.icon}</div>
+        <div class="up-name">${u.title} <span class="up-tier">${nextTierLabel}</span></div>
+        <div class="up-desc">${nextTierDesc}</div>
+      `;
+      el.addEventListener('click', () => chooseUpgrade(i));
+      upOptsEl.appendChild(el);
+    });
+    upgradeEl.classList.add('on');
+  }
+
+  function chooseUpgrade(i) {
+    if (Game.phase !== 'upgrade') return;
+    const pick = currentChoices[i];
+    if (!pick) return;
+    applyUpgrade(pick.key);
+    currentChoices = [];
+    upgradeEl.classList.remove('on');
+    Game.phase = 'playing';
+    // Reset spawn timer so one extra beat of calm after picking.
+    Game.spawnTimer = Math.max(Game.spawnTimer, 1.0);
+  }
+
+  // Called every frame from the game loop while phase === 'playing'.
+  function checkWaveAdvance() {
+    const dp = getDiffPhase();
+    if (dp.idx > Game.waveIdx) {
+      Game.waveIdx = dp.idx;
+      showUpgradePicker(dp);
+    }
+  }
+
+  function startGame() {
+    if (Game.phase !== 'menu') return;
+    menuEl.classList.add('hidden');
+    Game.phase = 'playing';
+    document.getElementById('hud').style.display = '';
+    document.getElementById('hint').style.display = '';
+    GameAudio.init();
+  }
+
+  function showGameOver() {
+    Game.phase = 'over';
+    GameAudio.stopFootsteps();
+
+    // Update session best.
+    const newBestKills = Game.kills > SessionBest.kills;
+    const newBestTime  = Game.time  > SessionBest.time;
+    if (newBestKills) SessionBest.kills = Game.kills;
+    if (newBestTime)  SessionBest.time  = Game.time;
+
+    goTimeEl.textContent    = fmtTime(Game.time);
+    goKillsEl.textContent   = String(Game.kills);
+    goAbilityEl.textContent = Game.currentAbilityName;
+    goPhaseEl.textContent   = (() => { const d = getDiffPhase(); return `Fell in Wave ${d.name} — ${d.label}`; })();
+
+    if (SessionBest.kills > 0) {
+      const parts = [];
+      if (newBestKills) parts.push(`🏆 New best: ${SessionBest.kills} kills`);
+      else parts.push(`Best this session: ${SessionBest.kills} kills`);
+      if (newBestTime) parts.push(`${fmtTime(SessionBest.time)} survived`);
+      goBestEl.textContent = parts.join('  ·  ');
+    } else {
+      goBestEl.textContent = '';
+    }
+
+    gameoverEl.classList.add('on');
+  }
+
+  function resetGame() {
+    // Tear down ALL entities via a snapshot — avoids any mutation-during-iteration risk.
+    const allIds = Array.from(ECS.alive);
+    for (const id of allIds) ECS.destroyEntity(id);
+    // Clear particle + VFX pools (note capitalisation — these are the actual pools).
+    Particles.length = 0;
+    VfxRings.length  = 0;
+    AnimVfx.length   = 0;
+    FloatingText.length = 0;
+    AttackAnims.clear();
+    HitFlashes.clear();
+    Camera.shakeMag = 0; Camera.shakeOffX = 0; Camera.shakeOffY = 0;
+    // Reset game state.
+    Game.time      = 0;
+    Game.kills     = 0;
+    Game.paused    = false;
+    Game.pendingSwap = null;
+    Game.spawnTimer = 0;
+    Game.spawnInterval = 1.2;
+    Game.playerDir = 'south';
+    Game.animFrame = 0;
+    Game.animTimer = 0;
+    Game.waveIdx   = 1;
+    Game.upgrades  = DEFAULT_UPGRADES();
+    Game.activeBuffs = DEFAULT_BUFFS();
+    Game.playerKnockback = { vx: 0, vy: 0 };
+    // Reset camera.
+    Camera.x = 0; Camera.y = 0;
+    // Recreate player and default ability.
+    Game.playerId = createPlayer();
+    setAbility('basic_bolt');
+    // Hide every overlay, then flip back to playing (order matters).
+    gameoverEl.classList.remove('on');
+    upgradeEl.classList.remove('on');
+    swapEl.classList.remove('on');
+    Game.phase = 'playing';
+    // Make sure the HUD is shown (in case we died on the very first run).
+    document.getElementById('hud').style.display = '';
+    document.getElementById('hint').style.display = '';
+  }
+
+  document.getElementById('btn-start').addEventListener('click', startGame);
+  document.getElementById('btn-restart').addEventListener('click', resetGame);
+  // Any key press on the menu also starts the game; digits during upgrade pick one.
+  window.addEventListener('keydown', e => {
+    if (Game.phase === 'menu' && e.code !== 'F5' && e.code !== 'F12') { startGame(); return; }
+    if (Game.phase === 'upgrade') {
+      if (e.code === 'Digit1' || e.code === 'Numpad1') chooseUpgrade(0);
+      else if (e.code === 'Digit2' || e.code === 'Numpad2') chooseUpgrade(1);
+      else if (e.code === 'Digit3' || e.code === 'Numpad3') chooseUpgrade(2);
+    }
+  });
 
   // --------------------------- Boot ------------------------------------- //
   Game.playerId = createPlayer();
   setAbility('basic_bolt');
+  // HUD hidden on boot; startGame() reveals it when the player begins.
+  document.getElementById('hud').style.display = 'none';
+  document.getElementById('hint').style.display = 'none';
 
   // --------------------------- Game Loop -------------------------------- //
   let last = performance.now();
@@ -1615,57 +2706,159 @@
     const dt = Math.min((now - last) / 1000, MAX_DT);
     last = now;
 
-    if (!Game.paused && !Game.gameOver) {
+    if (Game.phase === 'playing' && !Game.paused) {
       Game.time += dt;
       playerMovementSystem(dt);
       spawnSystem(dt);
       enemyMoveSystem(dt);
       slowedDecaySystem(dt);
-      orbMagnetSystem(dt);       // pull nearby orbs toward player
+      orbMagnetSystem(dt);
       weaponSystem(dt);
       enemyAbilitySystem(dt);
       projectileSystem(dt);
       shockwaveSystem(dt);
       lifetimeSystem(dt);
       collisionSystem(dt);
+      hpRegenSystem(dt);
+      buffTimerSystem(dt);
+
+      // Godmode: keep player pinned at max HP. Must run BEFORE the death check
+      // so a single-frame burst of damage can't slip through.
+      if (Game.godmode) {
+        const gh = ECS.get(Game.playerId, 'Health');
+        if (gh) gh.hp = gh.max;
+      }
+
+      // Check for player death.
+      const ph = ECS.get(Game.playerId, 'Health');
+      if (ph && ph.hp <= 0) {
+        showGameOver();
+      } else {
+        // Detect wave transition *after* death check so a wave-end + death on the same frame still dies.
+        checkWaveAdvance();
+      }
     }
-    // VFX systems keep running even when paused (orb pickup flash should finish).
+
+    // VFX keeps running on menu + death screen for ambience.
     particleSystem(dt);
     vfxRingSystem(dt);
+    animVfxSystem(dt);
+    updateFloatingText(dt);
+    updateShake(dt);
 
     ctx.clearRect(0, 0, VIEW_W, VIEW_H);
     renderSystem();
     updateHUD();
 
-    const ph = ECS.get(Game.playerId, 'Health');
-    if (ph && ph.hp <= 0 && !Game.gameOver) {
-      Game.gameOver = true;
-      GameAudio.stopFootsteps();
-    }
-    if (Game.gameOver) drawGameOver();
-
     requestAnimationFrame(frame);
-  }
-
-  function drawGameOver() {
-    ctx.save();
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
-    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
-    ctx.fillStyle = '#ffffff';
-    ctx.textAlign = 'center';
-    ctx.font = '600 42px ui-monospace, Menlo, Consolas, monospace';
-    ctx.fillText('YOU DIED', VIEW_W / 2, VIEW_H / 2 - 10);
-    ctx.font = '14px ui-monospace, Menlo, Consolas, monospace';
-    ctx.fillStyle = '#8a90a2';
-    ctx.fillText(`Kills: ${Game.kills}   ·   Time: ${hudTime.textContent}`, VIEW_W / 2, VIEW_H / 2 + 22);
-    ctx.fillText('Refresh to try again', VIEW_W / 2, VIEW_H / 2 + 44);
-    ctx.restore();
   }
 
   requestAnimationFrame(frame);
 
   // Expose for debugging.
-  window.__GAME__ = { ECS, Game, EnemyArchetypes, PlayerWeapons, setAbility };
+  window.__GAME__ = {
+    ECS, Game, EnemyArchetypes, PlayerWeapons, setAbility,
+    startGame, showGameOver, resetGame, checkWaveAdvance, chooseUpgrade,
+    applyUpgrade, getDiffPhase,
+    // Progression internals (for smoke tests):
+    UpgradePool, DROP_DEFS, spawnDrop, spawnPlayerProjectile,
+    currentTier, pickThreeUpgrades, onEnemyKilled, fireVolley, buffTimerSystem,
+    // Game-feel internals:
+    Camera, HitFlashes, FloatingText, triggerShake, updateShake,
+    applyDamageFX, spawnDamageNumber, hurtPlayer, getFlashIntensity,
+  };
+
+  // --------------------------- Dev Console ------------------------------ //
+  // Wave start times (in seconds) — keep in sync with getDiffPhase().
+  const WAVE_START_TIMES = { 1: 0, 2: 60, 3: 140, 4: 230, 5: 330 };
+
+  // Shared impl so both camelCase + snake_case aliases work.
+  function devSetAbility(kind) {
+    // Accept quoted string OR raw identifier (coerce to string) OR a kind-like token.
+    const key = typeof kind === 'string' ? kind : String(kind || '');
+    if (!PlayerWeapons[key]) {
+      console.warn(`[dev] unknown ability: "${key}". Options:`, Object.keys(PlayerWeapons));
+      return;
+    }
+    setAbility(key);
+    console.log(`[dev] ability -> ${key}`);
+  }
+
+  function devSkipToWave(n) {
+    const target = Math.max(1, Math.min(5, n | 0));
+    if (Game.phase !== 'playing') {
+      console.warn('[dev] skipToWave: start the game first');
+      return;
+    }
+    Game.time = WAVE_START_TIMES[target];
+    Game.waveIdx = target;
+    // Clear in-flight enemies, projectiles, orbs, shockwaves — leave the player.
+    for (const id of Array.from(ECS.alive)) {
+      if (id === Game.playerId) continue;
+      ECS.destroyEntity(id);
+    }
+    AttackAnims.clear();
+    console.log(`[dev] jumped to Wave ${target} (t=${Game.time}s)`);
+  }
+
+  function devGodmode(on) {
+    Game.godmode = (on === undefined) ? !Game.godmode : !!on;
+    if (Game.godmode) {
+      const h = ECS.get(Game.playerId, 'Health');
+      if (h) h.hp = h.max;
+    }
+    console.log(`[dev] godmode ${Game.godmode ? 'ON' : 'OFF'}`);
+    return Game.godmode;
+  }
+
+  function devHeal() {
+    const h = ECS.get(Game.playerId, 'Health');
+    if (h) { h.hp = h.max; console.log(`[dev] healed to ${h.max}`); }
+  }
+
+  function devKillAll() {
+    let n = 0;
+    for (const id of Array.from(ECS.query('EnemyTag'))) {
+      const h = ECS.get(id, 'Health');
+      if (h) { h.hp = 0; }
+      onEnemyKilled(id);
+      n++;
+    }
+    console.log(`[dev] killed ${n} enemies`);
+  }
+
+  function devHelp() {
+    console.log(
+      '[dev] commands (camelCase or snake_case both work):\n' +
+      '  dev.godmode() / dev.god_mode()         toggle invulnerability\n' +
+      '  dev.godmode(true|false)                force invulnerability on/off\n' +
+      '  dev.skipToWave(n) / dev.skip_to_wave(n)   jump to wave 1..5\n' +
+      "  dev.setAbility('kind') / dev.set_ability('kind')\n" +
+      "      kinds: 'basic_bolt' | 'fireball' | 'frost_trail' | 'aoe_pulse'\n" +
+      '      (quote the kind — e.g. dev.set_ability("aoe_pulse"))\n' +
+      '  dev.heal()         full heal\n' +
+      '  dev.killAll() / dev.kill_all()  clear all enemies on screen\n' +
+      '  dev.help()         this message'
+    );
+  }
+
+  window.dev = {
+    // camelCase
+    godmode:    devGodmode,
+    skipToWave: devSkipToWave,
+    heal:       devHeal,
+    setAbility: devSetAbility,
+    killAll:    devKillAll,
+    help:       devHelp,
+    // snake_case aliases for muscle memory / matching in-code naming
+    god_mode:     devGodmode,
+    skip_to_wave: devSkipToWave,
+    set_ability:  devSetAbility,
+    kill_all:     devKillAll,
+    // Abilities constant for easy reference / autocomplete
+    abilities: Object.keys(PlayerWeapons),
+  };
+  console.log('[dev] console ready — type `dev.help()` for commands');
 })();
 </script>
 </body>
